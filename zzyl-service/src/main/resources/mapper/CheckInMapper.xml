@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.CheckInMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.CheckIn">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="check_in_code" jdbcType="VARCHAR" property="checkInCode"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+        <result column="counselor" jdbcType="VARCHAR" property="counselor"/>
+        <result column="check_in_time" jdbcType="TIMESTAMP" property="checkInTime"/>
+        <result column="reason" jdbcType="VARCHAR" property="reason"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="applicat" jdbcType="VARCHAR" property="applicat"/>
+        <result column="dept_no" jdbcType="VARCHAR" property="deptNo"/>
+        <result column="applicat_id" jdbcType="BIGINT" property="applicatId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="flow_status" jdbcType="INTEGER" property="flowStatus"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="other_apply_info" jdbcType="LONGVARCHAR" property="otherApplyInfo"/>
+        <result column="review_info" jdbcType="LONGVARCHAR" property="reviewInfo"/>
+        <result column="update_time" property="updateTime"/>
+        <collection property="elderDto" ofType="com.zzyl.dto.ElderDto">
+            <id column="id" jdbcType="BIGINT" property="id"/>
+            <result column="ename" jdbcType="VARCHAR" property="name"/>
+            <result column="image" jdbcType="VARCHAR" property="image"/>
+            <result column="id_card_no" jdbcType="VARCHAR" property="idCardNo"/>
+            <result column="status" jdbcType="INTEGER" property="status"/>
+        </collection>
+        <collection property="bedVo" ofType="com.zzyl.vo.BedVo">
+            <id column="id" property="id"/>
+            <result column="bed_number" property="bedNumber"/>
+            <result column="bed_status" property="bedStatus"/>
+            <result column="room_id" property="roomId"/>
+            <result property="sort" column="sort"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , check_in_code, title, elder_id, counselor, check_in_time, reason, remark, applicat,
+    dept_no, applicat_id, create_time, flow_status, status, update_time
+    </sql>
+    <sql id="Blob_Column_List">
+        other_apply_info
+        , review_info
+    </sql>
+
+
+    <select id="selectByCheckInCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from check_in
+        where check_in_code = #{checkInCode,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from check_in
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.zzyl.entity.CheckIn" useGeneratedKeys="true" keyProperty="id">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into check_in (check_in_code, title, elder_id,
+        counselor, check_in_time, reason,
+        remark, applicat, dept_no,
+        applicat_id, create_time, flow_status,
+        status, other_apply_info, review_info, update_time
+        )
+        values (#{checkInCode,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{elderId,jdbcType=BIGINT},
+        #{counselor,jdbcType=VARCHAR}, #{checkInTime,jdbcType=TIMESTAMP}, #{reason,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR}, #{applicat,jdbcType=VARCHAR}, #{deptNo,jdbcType=VARCHAR},
+        #{applicatId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{flowStatus,jdbcType=INTEGER},
+        #{status,jdbcType=INTEGER}, #{otherApplyInfo,jdbcType=LONGVARCHAR}, #{reviewInfo,jdbcType=LONGVARCHAR},
+        #{updateTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.CheckIn">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into check_in
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkInCode != null">
+                check_in_code,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="elderId != null">
+                elder_id,
+            </if>
+            <if test="counselor != null">
+                counselor,
+            </if>
+            <if test="checkInTime != null">
+                check_in_time,
+            </if>
+            <if test="reason != null">
+                reason,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="applicat != null">
+                applicat,
+            </if>
+            <if test="deptNo != null">
+                dept_no,
+            </if>
+            <if test="applicatId != null">
+                applicat_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="flowStatus != null">
+                flow_status,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="otherApplyInfo != null">
+                other_apply_info,
+            </if>
+            <if test="reviewInfo != null">
+                review_info,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkInCode != null">
+                #{checkInCode,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="elderId != null">
+                #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="counselor != null">
+                #{counselor,jdbcType=VARCHAR},
+            </if>
+            <if test="checkInTime != null">
+                #{checkInTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="reason != null">
+                #{reason,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="applicat != null">
+                #{applicat,jdbcType=VARCHAR},
+            </if>
+            <if test="deptNo != null">
+                #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="applicatId != null">
+                #{applicatId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="flowStatus != null">
+                #{flowStatus,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="otherApplyInfo != null">
+                #{otherApplyInfo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="reviewInfo != null">
+                #{reviewInfo,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.CheckIn">
+        update check_in
+        <set>
+            <if test="checkInCode != null">
+                check_in_code = #{checkInCode,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="counselor != null">
+                counselor = #{counselor,jdbcType=VARCHAR},
+            </if>
+            <if test="checkInTime != null">
+                check_in_time = #{checkInTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="reason != null">
+                reason = #{reason,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="applicat != null">
+                applicat = #{applicat,jdbcType=VARCHAR},
+            </if>
+            <if test="deptNo != null">
+                dept_no = #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="applicatId != null">
+                applicat_id = #{applicatId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="flowStatus != null">
+                flow_status = #{flowStatus,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="otherApplyInfo != null">
+                other_apply_info = #{otherApplyInfo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="reviewInfo != null">
+                review_info = #{reviewInfo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zzyl.entity.CheckIn">
+        update check_in
+        set check_in_code    = #{checkInCode,jdbcType=VARCHAR},
+            title            = #{title,jdbcType=VARCHAR},
+            elder_id         = #{elderId,jdbcType=BIGINT},
+            counselor        = #{counselor,jdbcType=VARCHAR},
+            check_in_time    = #{checkInTime,jdbcType=TIMESTAMP},
+            reason           = #{reason,jdbcType=VARCHAR},
+            remark           = #{remark,jdbcType=VARCHAR},
+            applicat         = #{applicat,jdbcType=VARCHAR},
+            dept_no          = #{deptNo,jdbcType=VARCHAR},
+            applicat_id      = #{applicatId,jdbcType=BIGINT},
+            create_time      = #{createTime,jdbcType=TIMESTAMP},
+            flow_status      = #{flowStatus,jdbcType=INTEGER},
+            status           = #{status,jdbcType=INTEGER},
+            other_apply_info = #{otherApplyInfo,jdbcType=LONGVARCHAR},
+            review_info      = #{reviewInfo,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.CheckIn">
+        update check_in
+        set check_in_code = #{checkInCode,jdbcType=VARCHAR},
+            title         = #{title,jdbcType=VARCHAR},
+            elder_id      = #{elderId,jdbcType=BIGINT},
+            counselor     = #{counselor,jdbcType=VARCHAR},
+            check_in_time = #{checkInTime,jdbcType=TIMESTAMP},
+            reason        = #{reason,jdbcType=VARCHAR},
+            remark        = #{remark,jdbcType=VARCHAR},
+            applicat      = #{applicat,jdbcType=VARCHAR},
+            dept_no       = #{deptNo,jdbcType=VARCHAR},
+            applicat_id   = #{applicatId,jdbcType=BIGINT},
+            create_time   = #{createTime,jdbcType=TIMESTAMP},
+            flow_status   = #{flowStatus,jdbcType=INTEGER},
+            status        = #{status,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into check_in (check_in_code, title, elder_id, counselor, check_in_time, reason, remark, applicat,
+        dept_no, applicat_id, create_time, flow_status, status, other_apply_info, review_info)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.checkInCode,jdbcType=VARCHAR}, #{item.title,jdbcType=VARCHAR}, #{item.elderId,jdbcType=BIGINT},
+            #{item.counselor,jdbcType=VARCHAR}, #{item.checkInTime,jdbcType=TIMESTAMP}, #{item.reason,jdbcType=VARCHAR},
+            #{item.remark,jdbcType=VARCHAR}, #{item.applicat,jdbcType=VARCHAR}, #{item.deptNo,jdbcType=VARCHAR},
+            #{item.applicatId,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.flowStatus,jdbcType=INTEGER}, #{item.status,jdbcType=INTEGER},
+            #{item.otherApplyInfo,jdbcType=LONGVARCHAR}, #{item.reviewInfo,jdbcType=LONGVARCHAR})
+        </foreach>
+    </insert>
+
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        c.id, c.check_in_code, c.title, c.elder_id, c.counselor, c.check_in_time, c.reason, c.remark, c.applicat,
+        c.dept_no, c.applicat_id, c.create_time, c.flow_status, c.status , e.name as ename, e.id_card_no as id_card_no,
+        bed.bed_number
+        from check_in c
+        left join elder e on elder_id = e.id
+        left join bed bed on bed.id = e.bed_id
+        where (applicat_id = #{applicatId} or dept_no = #{deptNo})
+        and c.status = 2
+        <if test="checkInCode != null and checkInCode != ''">
+            AND c.check_in_code = #{checkInCode}
+        </if>
+
+        <if test="name != null and name != ''">
+            and e.name like concat('%', #{name}, '%')
+        </if>
+        <if test="idCardNo != null and idCardNo != ''">
+            AND e.id_card_no = #{idCardNo}
+        </if>
+
+        <if test="startTime != null and endTime != null">
+            and c.check_in_time between #{startTime} and #{endTime}
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectByPrimaryKey" resultType="com.zzyl.entity.CheckIn">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from check_in
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectByUserId" resultType="com.zzyl.entity.CheckIn">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from check_in
+        where applicat_id = #{userId,jdbcType=BIGINT}
+    </select>
+</mapper>

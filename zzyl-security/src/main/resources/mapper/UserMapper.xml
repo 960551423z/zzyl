@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.User">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="user_type" jdbcType="VARCHAR" property="userType"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="sex" jdbcType="CHAR" property="sex"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="dept_no" jdbcType="VARCHAR" property="deptNo"/>
+        <result column="post_no" jdbcType="VARCHAR" property="postNo"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+    </resultMap>
+    <resultMap id="BaseResultVoMap" type="com.zzyl.vo.UserVo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="user_type" jdbcType="VARCHAR" property="userType"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="sex" jdbcType="CHAR" property="sex"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="dept_no" jdbcType="VARCHAR" property="deptNo"/>
+        <result column="post_no" jdbcType="VARCHAR" property="postNo"/>
+        <result column="role_id" jdbcType="BIGINT" property="roleId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , username, open_id, password, user_type, avatar, nick_name, email, real_name,
+    mobile, sex, data_state, create_time, update_time, remark, create_by, update_by,dept_no,post_no
+    </sql>
+
+    <select id="selectPage" parameterType="com.zzyl.dto.UserDto" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user
+        <where>
+            <if test="userDto.realName!=null and userDto.realName!=''">
+                and real_name like concat('%',#{userDto.realName},'%')
+            </if>
+            <if test="userDto.email!=null and userDto.email!=''">
+                and email like concat('%',#{userDto.email},'%')
+            </if>
+
+            <if test="userDto.mobile!=null and userDto.mobile!=''">
+                and mobile=#{userDto.mobile}
+            </if>
+            <if test="userDto.deptNo!=null and userDto.deptNo!=''">
+                and dept_no like concat(#{userDto.deptNo},'%')
+            </if>
+            <if test="userDto.roleId!=null and userDto.roleId!=''">
+                and id IN (SELECT ur.user_id FROM sys_user_role ur WHERE ur.role_id = #{userDto.roleId})
+            </if>
+            <if test="userDto.dataState!=null and userDto.dataState!=''">
+                and data_state=#{userDto.dataState}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="selectList" parameterType="com.zzyl.vo.UserVo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user
+        <where>
+            <if test="userVo.username!=null and userVo.username!=''">
+                and username like concat('%',#{userVo.username},'%')
+            </if>
+            <if test="userVo.mobile!=null and userVo.mobile!=''">
+                and mobile=#{userVo.mobile}
+            </if>
+            <if test="userVo.deptNo!=null and userVo.deptNo!=''">
+                and dept_no like concat(#{userVo.deptNo},'%')
+            </if>
+            <if test="userVo.roleId!=null and userVo.roleId!=''">
+                and id IN (SELECT ur.user_id FROM sys_user_role ur WHERE ur.role_id = #{userVo.roleId})
+            </if>
+            <if test="userVo.dataState!=null and userVo.dataState!=''">
+                and data_state=#{userVo.dataState}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="findUserVoListByDeptNo" parameterType="java.lang.String" resultMap="BaseResultVoMap">
+        SELECT u.id,
+               u.user_name,
+               u.open_id,
+               u.password,
+               u.user_type,
+               u.avatar,
+               u.nick_name,
+               u.email,
+               u.real_name,
+               u.mobile,
+               u.sex,
+               u.data_state,
+               u.create_by,
+               u.create_time,
+               u.update_by,
+               u.update_time,
+               u.remark,
+               u.dept_no
+        FROM sys_user u
+        WHERE u.post_no = #{deptNo}
+          AND u.data_state = '0'
+    </select>
+    <select id="findUserVoListByPostNo" parameterType="java.lang.String" resultMap="BaseResultVoMap">
+        SELECT u.id,
+               u.user_name,
+               u.open_id,
+               u.password,
+               u.user_type,
+               u.avatar,
+               u.nick_name,
+               u.email,
+               u.real_name,
+               u.mobile,
+               u.sex,
+               u.data_state,
+               u.create_by,
+               u.create_time,
+               u.update_by,
+               u.update_time,
+               u.remark,
+               u.post_no
+        FROM sys_user u
+        WHERE u.post_no = #{postNo}
+          AND u.data_state = '0'
+    </select>
+    <select id="findUserVoListByRoleId" parameterType="java.lang.Long" resultMap="BaseResultVoMap">
+        SELECT u.id,
+               u.user_name,
+               u.open_id,
+               u.password,
+               u.user_type,
+               u.avatar,
+               u.nick_name,
+               u.email,
+               u.real_name,
+               u.mobile,
+               u.sex,
+               u.data_state,
+               u.create_by,
+               u.create_time,
+               u.update_by,
+               u.update_time,
+               u.remark,
+               ur.role_id
+        FROM sys_user_role ur
+                 LEFT JOIN sys_user u ON ur.user_id = u.id
+        WHERE ur.role_id = #{roleId}
+          AND u.data_state = '0'
+    </select>
+    <select id="findUserVoForLogin" parameterType="com.zzyl.vo.UserVo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user
+        <where>
+            <if test="userVo.username!=null">
+                and username = #{userVo.username}
+            </if>
+            <if test="userVo.mobile!=null">
+                and mobile=#{userVo.mobile}
+            </if>
+            <if test="userVo.openId!=null">
+                and open_id=#{userVo.openId}
+            </if>
+            <if test="userVo.dataState!=null">
+                and data_state=#{userVo.dataState}
+            </if>
+        </where>
+    </select>
+    <insert id="insert" parameterType="com.zzyl.entity.User">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_user (username, open_id, password,
+        user_type, avatar, nick_name,
+        email, real_name, mobile,
+        sex, data_state, create_time,
+        update_time, remark, create_by,
+        update_by,dept_no,post_no)
+        values (#{username,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+        #{userType,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR},
+        #{email,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR},
+        #{sex,jdbcType=CHAR}, #{dataState,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=BIGINT},
+        #{updateBy,jdbcType=BIGINT}, #{deptNo,jdbcType=VARCHAR}, #{postNo,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.User">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">
+                username,
+            </if>
+            <if test="openId != null">
+                open_id,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="userType != null">
+                user_type,
+            </if>
+            <if test="avatar != null">
+                avatar,
+            </if>
+            <if test="nickName != null">
+                nick_name,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="realName != null">
+                real_name,
+            </if>
+            <if test="mobile != null">
+                mobile,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="dataState != null">
+                data_state,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="deptNo != null">
+                dept_no,
+            </if>
+            <if test="postNo != null">
+                post_no,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="userType != null">
+                #{userType,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null">
+                #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="realName != null">
+                #{realName,jdbcType=VARCHAR},
+            </if>
+            <if test="mobile != null">
+                #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=CHAR},
+            </if>
+            <if test="dataState != null">
+                #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="deptNo != null">
+                #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postNo != null">
+                #{postNo,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.User">
+        update sys_user
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="userType != null">
+                user_type = #{userType,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName,jdbcType=VARCHAR},
+            </if>
+            <if test="mobile != null">
+                mobile = #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=CHAR},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="deptNo != null">
+                dept_no = #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postNo != null">
+                post_no = #{postNo,jdbcType=VARCHAR},
+            </if>
+
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteUserByIds" parameterType="Long">
+        delete from sys_user where id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+    <select id="selectUserByIds" parameterType="Long" resultMap="BaseResultMap">
+
+        select * from sys_user where id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+</mapper>

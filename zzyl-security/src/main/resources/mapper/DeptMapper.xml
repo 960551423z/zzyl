@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.DeptMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Dept">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_dept_no" jdbcType="VARCHAR" property="parentDeptNo"/>
+        <result column="dept_no" jdbcType="VARCHAR" property="deptNo"/>
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName"/>
+        <result column="sort_no" jdbcType="INTEGER" property="sortNo"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="leader_id" jdbcType="BIGINT" property="leaderId"/>
+        <result column="leader_name" jdbcType="BIGINT" property="leaderName"/>
+    </resultMap>
+    <resultMap id="BaseResultVoMap" type="com.zzyl.vo.DeptVo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_dept_no" jdbcType="VARCHAR" property="parentDeptNo"/>
+        <result column="dept_no" jdbcType="VARCHAR" property="deptNo"/>
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName"/>
+        <result column="sort_no" jdbcType="INTEGER" property="sortNo"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="leader_id" jdbcType="BIGINT" property="leaderId"/>
+        <result column="role_id" jdbcType="BIGINT" property="roleId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , parent_dept_no, dept_no, dept_name, sort_no, data_state, create_time, update_time,
+    create_by, update_by, remark, leader_id
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_dept
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectList" parameterType="com.zzyl.dto.DeptDto" resultMap="BaseResultMap">
+        select
+        d.id, d.parent_dept_no, d.dept_no, d.dept_name, d.sort_no, d.data_state, d.create_time, d.update_time,
+        d.create_by, d.update_by, d.remark, d.leader_id
+        , u.real_name as leader_name
+        from sys_dept d
+        left join sys_user u on u.id = leader_id
+        <where>
+            <if test="deptDto.deptName!=null and deptDto.deptName!=''">
+                and d.dept_name like concat('%',#{deptDto.deptName},'%')
+            </if>
+            <if test="deptDto.deptNo!=null and deptDto.deptNo!='' ">
+                and d.dept_no=#{deptDto.deptNo}
+            </if>
+            <if test="deptDto.parentDeptNo!=null and deptDto.parentDeptNo!=''">
+                and d.parent_dept_no like concat(#{deptDto.parentDeptNo},'%')
+            </if>
+            <if test="deptDto.leaderId!=null and deptDto.leaderId!=''">
+                and d.leader_id=#{deptDto.leaderId}
+            </if>
+            <if test="deptDto.dataState!=null and deptDto.dataState!=''">
+                and d.data_state=#{deptDto.dataState}
+            </if>
+        </where>
+        order by d.sort_no asc, d.create_time desc
+    </select>
+    <select id="findDeptInDeptNos" parameterType="java.util.List" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_dept
+        where dept_no in
+        <foreach close=")" collection="deptNos" item="deptNo" open="(" separator=",">
+            #{deptNo}
+        </foreach>
+        order by sort_no asc, create_time desc
+    </select>
+
+    <select id="findDeptVoListInRoleId" parameterType="java.util.List" resultMap="BaseResultVoMap">
+        SELECT d.id,d.dept_no,d.dept_name,d.sort_no,d.data_state,d.create_by,
+        d.create_time,d.update_by,d.update_time,d.leader_id,rd.role_id
+        FROM sys_role_dept rd
+        LEFT JOIN sys_dept d ON rd.dept_no = d.dept_no
+        WHERE d.data_state ='0'
+        AND rd.role_id IN (
+        <foreach collection='roleIds' separator=',' item='roleId'>
+            #{roleId}
+        </foreach>)
+    </select>
+    <select id="selectByDeptNo" resultType="com.zzyl.entity.Dept">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_dept
+        where dept_no = #{deptNo,jdbcType=VARCHAR}
+
+    </select>
+
+    <select id="hasChildByDeptId" parameterType="java.lang.String" resultType="int">
+        select count(1)
+        from sys_dept
+        where `parent_dept_no` = #{deptId} limit 1
+    </select>
+    <select id="checkDeptExistUser" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(1)
+        FROM `sys_user`
+        where dept_no = #{deptId}
+    </select>
+
+    <delete id="deleteByDeptNo" parameterType="java.lang.String">
+        delete
+        from sys_dept
+        where dept_no = #{deptId}
+    </delete>
+
+    <select id="selectChildrenDeptById" parameterType="java.lang.String" resultMap="BaseResultVoMap">
+        select *
+        from sys_dept
+        where find_in_set(#{deptId}, ancestors)
+    </select>
+    <insert id="insert" parameterType="com.zzyl.entity.Dept">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_dept
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentDeptNo != null">
+                parent_dept_no,
+            </if>
+            <if test="deptNo != null">
+                dept_no,
+            </if>
+            <if test="deptName != null">
+                dept_name,
+            </if>
+            <if test="sortNo != null">
+                sort_no,
+            </if>
+            <if test="dataState != null">
+                data_state,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="leaderId != null">
+                leader_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentDeptNo != null">
+                #{parentDeptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="deptNo != null">
+                #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null">
+                #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="leaderId != null">
+                #{leaderId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Dept">
+        update sys_dept
+        <set>
+            <if test="parentDeptNo != null">
+                parent_dept_no = #{parentDeptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="deptNo != null">
+                dept_no = #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null">
+                dept_name = #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="leaderId != null">
+                leader_id = #{leaderId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

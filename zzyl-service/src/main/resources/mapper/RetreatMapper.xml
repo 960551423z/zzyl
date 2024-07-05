@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zzyl.mapper.RetreatMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Retreat">
+        <id column="id" property="id"/>
+        <result column="applicat" property="applicat"/>
+        <result column="applicat_id" property="applicatId"/>
+        <result column="bed_no" property="bedNo"/>
+        <result column="check_in_end_time" property="checkInEndTime"/>
+        <result column="check_in_start_time" property="checkInStartTime"/>
+        <result column="check_out_time" property="checkOutTime"/>
+        <result column="contract_name" property="contractName"/>
+        <result column="contract_no" property="contractNo"/>
+        <result column="contract_url" property="contractUrl"/>
+        <result column="counselor" property="counselor"/>
+        <result column="nursing_name" property="nursingName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="elder_id" property="elderId"/>
+        <result column="flow_status" property="flowStatus"/>
+        <result column="id_card_no" property="idCardNo"/>
+        <result column="name" property="name"/>
+        <result column="nursing_level_name" property="nursingLevelName"/>
+        <result column="phone" property="phone"/>
+        <result column="reason" property="reason"/>
+        <result column="remark" property="remark"/>
+        <result column="retreat_code" property="retreatCode"/>
+        <result column="status" property="status"/>
+        <result column="title" property="title"/>
+        <result column="dept_no" property="deptNo"/>
+    </resultMap>
+    <insert id="createRetreat" parameterType="com.zzyl.entity.Retreat" useGeneratedKeys="true" keyProperty="id">
+        insert into retreat(retreat_code, title, elder_id, name, id_card_no, phone, check_in_start_time,
+                            check_in_end_time, nursing_level_name,
+                            bed_no, contract_name, contract_url, contract_no, counselor, nursing_name, check_out_time,
+                            reason, remark,
+                            applicat, applicat_id, dept_no
+            , create_time, flow_status, status, create_by)
+        values (#{retreatCode}, #{title}, #{elderId}, #{name}, #{idCardNo}, #{phone}, #{checkInStartTime},
+                #{checkInEndTime}, #{nursingLevelName},
+                #{bedNo}, #{contractName}, #{contractUrl}, #{contractNo}, #{counselor}, #{nursingName}, #{checkOutTime},
+                #{reason},
+                #{remark}
+                   , #{applicat}, #{applicatId}, #{deptNo}, #{createTime}, #{flowStatus}, #{status}, #{createBy})
+    </insert>
+
+    <sql id="Base_Column_List">
+        retreat_code
+        ,title,elder_id,name,id_card_no, phone, check_in_start_time, check_in_end_time, nursing_level_name,
+                            bed_no, contract_name, contract_url,contract_no, counselor, nursing_name, check_out_time, reason, remark, applicat,applicat_id
+            , create_time, flow_status, status,dept_no
+    </sql>
+
+    <update id="update" parameterType="com.zzyl.entity.Retreat">
+        UPDATE retreat
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="elderId != null">elder_id = #{elderId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="idCardNo != null">id_card_no = #{idCardNo},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="checkInStartTime != null">check_in_start_time = #{checkInStartTime},</if>
+            <if test="checkInEndTime != null">check_in_end_time = #{checkInEndTime},</if>
+            <if test="nursingLevelName != null">nursing_level_name = #{nursingLevelName},</if>
+            <if test="bedNo != null">bed_no = #{bedNo},</if>
+            <if test="contractName != null">contract_name = #{contractName},</if>
+            <if test="contractUrl != null">contract_url = #{contractUrl},</if>
+            <if test="contractNo != null">contract_no = #{contractNo},</if>
+            <if test="counselor != null">counselor = #{counselor},</if>
+            <if test="nursingName != null">nursing_name = #{nursingName},</if>
+            <if test="checkOutTime != null">check_out_time = #{checkOutTime},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="applicat != null">applicat = #{applicat},</if>
+            <if test="applicatId != null">applicat_id = #{applicatId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="flowStatus != null">flow_status = #{flowStatus},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE retreat_code = #{retreatCode}
+    </update>
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from retreat
+        where status = 2
+        <if test="retreatCode != null and retreatCode != ''">
+            AND retreat_code = #{retreatCode}
+        </if>
+        <if test="name != null">
+            and name like concat('%', #{name}, '%')
+        </if>
+        <if test="idCardNo != null and idCardNo != ''">
+            AND id_card_no = #{idCardNo}
+        </if>
+        <if test="startTime != null and endTime != null">
+            and check_out_time between #{startTime} and #{endTime}
+        </if>
+        <if test="params.dataScope != null">
+            and ${params.dataScope}
+        </if>
+        order by create_time desc
+    </select>
+
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.MemberElderMapper">
+
+    <resultMap id="memberElderResultMap" type="com.zzyl.entity.MemberElder">
+        <id property="id" column="mid"/>
+        <result property="memberId" column="member_id"/>
+        <result property="elderId" column="elder_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="mremark"/>
+        <collection property="elderVo" ofType="com.zzyl.vo.retreat.ElderVo">
+            <id column="eid" jdbcType="BIGINT" property="id"/>
+            <result column="name" jdbcType="VARCHAR" property="name"/>
+            <result column="image" jdbcType="VARCHAR" property="image"/>
+            <result column="id_card_no" jdbcType="VARCHAR" property="idCardNo"/>
+            <result column="status" jdbcType="INTEGER" property="status"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+            <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        </collection>
+
+        <collection property="bedVo" ofType="com.zzyl.vo.BedVo">
+            <id column="bid" property="id"/>
+            <result column="bed_number" property="bedNumber"/>
+            <result column="bed_status" property="bedStatus"/>
+            <result column="room_id" property="roomId"/>
+            <result property="sort" column="sort"/>
+            <result column="create_by" property="createBy"/>
+            <result column="update_by" property="updateBy"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+        </collection>
+        <collection property="roomVo" ofType="com.zzyl.vo.RoomVo">
+            <id property="id" column="rid"/>
+            <result property="code" column="code"/>
+            <result property="sort" column="sort"/>
+            <result property="sort" column="sort"/>
+            <result property="floorId" column="floor_id"/>
+            <result column="create_by" property="createBy"/>
+            <result column="update_by" property="updateBy"/>
+            <result column="type_name" property="typeName"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+        </collection>
+
+        <collection property="deviceVos" ofType="com.zzyl.vo.DeviceVo">
+            <id column="did" jdbcType="BIGINT" property="id"/>
+            <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+            <result column="binding_location" jdbcType="VARCHAR" property="bindingLocation"/>
+            <result column="location_type" jdbcType="INTEGER" property="locationType"/>
+            <result column="physical_location_type" jdbcType="INTEGER" property="physicalLocationType"/>
+            <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+            <result column="device_description" jdbcType="VARCHAR" property="deviceDescription"/>
+            <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+            <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+            <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+            <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+            <result column="product_id" jdbcType="VARCHAR" property="productKey"/>
+        </collection>
+    </resultMap>
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into member_elder(member_id, elder_id, create_time, create_by, remark)
+        values (#{memberId}, #{elderId}, #{createTime}, #{createBy}, #{remark})
+    </insert>
+
+    <update id="update">
+        update member_elder
+        set member_id   = #{memberId},
+            elder_id    = #{elderId},
+            update_time = #{updateTime},
+            update_by   = #{updateBy},
+            remark      = #{remark}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete
+        from member_elder
+        where id = #{id}
+    </delete>
+
+    <select id="getById" resultMap="memberElderResultMap">
+        select *
+        from member_elder
+        where id = #{id}
+    </select>
+
+    <select id="listByMemberId" resultMap="memberElderResultMap">
+        SELECT m.id     as mid,
+               m.remark as mremark,
+               m.elder_id,
+               e.name,
+               e.status,
+               e.image,
+               e.id     as eid,
+               bed.bed_number,
+               r.id     as rid,
+               r.type_name,
+               d.*
+        FROM member_elder m
+                 left join elder e on m.elder_id = e.id
+                 left join bed bed on bed.id = e.bed_id
+                 left join room r on r.id = bed.room_id
+                 left join device d on d.location_type = 0 and binding_location = e.id
+        where member_id = #{memberId}
+        group by m.id
+        order by m.create_time desc
+    </select>
+
+    <select id="listByElderId" resultMap="memberElderResultMap">
+        select *
+        from member_elder
+        where elder_id = #{elderId}
+        order by create_time desc
+    </select>
+
+    <select id="listByCondition" resultMap="memberElderResultMap">
+        SELECT m.id as mid, m.remark as mremark, m.elder_id, e.name, e.status, e.image, e.id as eid, bed.bed_number,
+        r.id as rid, r.type_name,
+        d.* FROM member_elder m
+        left join elder e on m.elder_id = e.id
+        left join bed bed on bed.id = e.bed_id
+        left join room r on r.id = bed.room_id
+        left join device d on d.location_type = 0 and binding_location = e.id
+        <where>
+            <if test="memberId != null">
+                AND member_id = #{memberId}
+            </if>
+            <if test="elderId != null">
+                AND elder_id = #{elderId}
+            </if>
+        </where>
+        group by e.id
+        order by m.create_time desc
+    </select>
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.DeviceMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.vo.DeviceVo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+        <result column="binding_location" jdbcType="VARCHAR" property="bindingLocation"/>
+        <result column="location_type" jdbcType="INTEGER" property="locationType"/>
+        <result column="physical_location_type" jdbcType="INTEGER" property="physicalLocationType"/>
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="device_description" jdbcType="VARCHAR" property="deviceDescription"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
+        <result column="product_id" jdbcType="VARCHAR" property="productKey"/>
+        <result column="produce_name" jdbcType="BIT" property="productName"/>
+        <result column="note_name" jdbcType="BIT" property="nickname"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , device_id, binding_location, location_type, physical_location_Type, device_name,
+    device_description, create_time, update_time, is_deleted, create_by, update_by, remark
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.zzyl.entity.Device">
+        select
+        <include refid="Base_Column_List"/>
+        from device
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByDeviceId" parameterType="java.lang.String">
+        delete
+        from device
+        where device_id = #{deviceId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.Device">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into device (device_id, binding_location, location_type,
+        physical_location_Type, device_name, device_description, note_name, product_id, produce_name,
+        create_time, update_time, is_deleted,
+        create_by, update_by, remark
+        )
+        values (#{deviceId,jdbcType=VARCHAR}, #{bindingLocation,jdbcType=VARCHAR}, #{locationType,jdbcType=INTEGER},
+        #{physicalLocationType,jdbcType=INTEGER}, #{deviceName,jdbcType=VARCHAR}, #{deviceDescription,jdbcType=VARCHAR},
+        #{noteName,jdbcType=VARCHAR},#{productId,jdbcType=VARCHAR},#{productName,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{isDeleted,jdbcType=BIT},
+        #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="selectByDeviceIds" resultMap="BaseResultMap">
+        select
+        d.*
+        , tu.real_name as creator
+        from device d
+        left join sys_user tu on tu.id = d.create_by
+        where device_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectByLocation" resultMap="BaseResultMap">
+        select d.id, d.device_id, d.binding_location, d.location_type,
+        d.physical_location_Type, d.device_name, d.device_description, d.note_name as nickname, d.product_id as
+        product_key, d.produce_name
+        from device d
+        where d.binding_location in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and d.location_type = 1
+        and d.physical_location_type = #{type}
+        group by d.id
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.Device">
+        update device
+        <set>
+            <if test="deviceId != null">
+                device_id = #{deviceId,jdbcType=VARCHAR},
+            </if>
+            <if test="noteName != null">
+                note_name = #{noteName,jdbcType=VARCHAR},
+            </if>
+            <if test="productId != null">
+                product_id = #{productId,jdbcType=VARCHAR},
+            </if>
+            <if test="productName != null">
+                product_name = #{productName,jdbcType=VARCHAR},
+            </if>
+            <if test="bindingLocation != null">
+                binding_location = #{bindingLocation,jdbcType=VARCHAR},
+            </if>
+            <if test="locationType != null">
+                location_type = #{locationType,jdbcType=INTEGER},
+            </if>
+            <if test="physicalLocationType != null">
+                physical_location_Type = #{physicalLocationType,jdbcType=INTEGER},
+            </if>
+            <if test="deviceName != null">
+                device_name = #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceDescription != null">
+                device_description = #{deviceDescription,jdbcType=VARCHAR},
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+                device_description = #{deviceDescription,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

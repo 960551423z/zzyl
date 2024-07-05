@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.CheckInConfigMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.CheckInConfig">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+        <result column="check_in_start_time" jdbcType="TIMESTAMP" property="checkInStartTime"/>
+        <result column="check_in_end_time" jdbcType="TIMESTAMP" property="checkInEndTime"/>
+        <result column="nursing_level_id" jdbcType="BIGINT" property="nursingLevelId"/>
+        <result column="bed_no" jdbcType="VARCHAR" property="bedNo"/>
+        <result column="cost_start_time" jdbcType="TIMESTAMP" property="costStartTime"/>
+        <result column="cost_end_time" jdbcType="TIMESTAMP" property="costEndTime"/>
+        <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+        <result column="nursing_cost" jdbcType="DECIMAL" property="nursingCost"/>
+        <result column="bed_cost" jdbcType="DECIMAL" property="bedCost"/>
+        <result column="other_cost" jdbcType="DECIMAL" property="otherCost"/>
+        <result column="medical_insurance_payment" jdbcType="DECIMAL" property="medicalInsurancePayment"/>
+        <result column="government_subsidy" jdbcType="DECIMAL" property="governmentSubsidy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , elder_id, check_in_start_time, check_in_end_time, nursing_level_id, bed_no, cost_start_time,
+    cost_end_time, deposit_amount, nursing_cost, bed_cost, other_cost, medical_insurance_payment,
+    government_subsidy, create_time, update_time, create_by, update_by, remark
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from check_in_config
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="findCurrentConfigByElderId" parameterType="java.lang.Long" resultType="com.zzyl.entity.CheckInConfig">
+        select
+        <include refid="Base_Column_List"/>
+        from check_in_config
+        where elder_id = #{elderId,jdbcType=BIGINT}
+        order by id desc limit 1
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from check_in_config
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByElderId">
+        delete
+        from check_in_config
+        where elder_id = #{elderId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.CheckInConfig">
+        insert into check_in_config (id, elder_id, check_in_start_time,
+                                     check_in_end_time, nursing_level_id, bed_no,
+                                     cost_start_time, cost_end_time, deposit_amount,
+                                     nursing_cost, bed_cost, other_cost,
+                                     medical_insurance_payment, government_subsidy,
+                                     create_time, update_time, create_by,
+                                     update_by, remark)
+        values (#{id,jdbcType=BIGINT}, #{elderId,jdbcType=BIGINT}, #{checkInStartTime,jdbcType=TIMESTAMP},
+                #{checkInEndTime,jdbcType=TIMESTAMP}, #{nursingLevelId,jdbcType=BIGINT}, #{bedNo,jdbcType=VARCHAR},
+                #{costStartTime,jdbcType=TIMESTAMP}, #{costEndTime,jdbcType=TIMESTAMP},
+                #{depositAmount,jdbcType=DECIMAL},
+                #{nursingCost,jdbcType=DECIMAL}, #{bedCost,jdbcType=DECIMAL}, #{otherCost,jdbcType=DECIMAL},
+                #{medicalInsurancePayment,jdbcType=DECIMAL}, #{governmentSubsidy,jdbcType=DECIMAL},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT},
+                #{updateBy,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.CheckInConfig">
+        insert into check_in_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="elderId != null">
+                elder_id,
+            </if>
+            <if test="checkInStartTime != null">
+                check_in_start_time,
+            </if>
+            <if test="checkInEndTime != null">
+                check_in_end_time,
+            </if>
+            <if test="nursingLevelId != null">
+                nursing_level_id,
+            </if>
+            <if test="bedNo != null">
+                bed_no,
+            </if>
+            <if test="costStartTime != null">
+                cost_start_time,
+            </if>
+            <if test="costEndTime != null">
+                cost_end_time,
+            </if>
+            <if test="depositAmount != null">
+                deposit_amount,
+            </if>
+            <if test="nursingCost != null">
+                nursing_cost,
+            </if>
+            <if test="bedCost != null">
+                bed_cost,
+            </if>
+            <if test="otherCost != null">
+                other_cost,
+            </if>
+            <if test="medicalInsurancePayment != null">
+                medical_insurance_payment,
+            </if>
+            <if test="governmentSubsidy != null">
+                government_subsidy,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="elderId != null">
+                #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="checkInStartTime != null">
+                #{checkInStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="checkInEndTime != null">
+                #{checkInEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="nursingLevelId != null">
+                #{nursingLevelId,jdbcType=BIGINT},
+            </if>
+            <if test="bedNo != null">
+                #{bedNo,jdbcType=VARCHAR},
+            </if>
+            <if test="costStartTime != null">
+                #{costStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="costEndTime != null">
+                #{costEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="depositAmount != null">
+                #{depositAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="nursingCost != null">
+                #{nursingCost,jdbcType=DECIMAL},
+            </if>
+            <if test="bedCost != null">
+                #{bedCost,jdbcType=DECIMAL},
+            </if>
+            <if test="otherCost != null">
+                #{otherCost,jdbcType=DECIMAL},
+            </if>
+            <if test="medicalInsurancePayment != null">
+                #{medicalInsurancePayment,jdbcType=DECIMAL},
+            </if>
+            <if test="governmentSubsidy != null">
+                #{governmentSubsidy,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.CheckInConfig">
+        update check_in_config
+        <set>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="checkInStartTime != null">
+                check_in_start_time = #{checkInStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="checkInEndTime != null">
+                check_in_end_time = #{checkInEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="nursingLevelId != null">
+                nursing_level_id = #{nursingLevelId,jdbcType=BIGINT},
+            </if>
+            <if test="bedNo != null">
+                bed_no = #{bedNo,jdbcType=VARCHAR},
+            </if>
+            <if test="costStartTime != null">
+                cost_start_time = #{costStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="costEndTime != null">
+                cost_end_time = #{costEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="depositAmount != null">
+                deposit_amount = #{depositAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="nursingCost != null">
+                nursing_cost = #{nursingCost,jdbcType=DECIMAL},
+            </if>
+            <if test="bedCost != null">
+                bed_cost = #{bedCost,jdbcType=DECIMAL},
+            </if>
+            <if test="otherCost != null">
+                other_cost = #{otherCost,jdbcType=DECIMAL},
+            </if>
+            <if test="medicalInsurancePayment != null">
+                medical_insurance_payment = #{medicalInsurancePayment,jdbcType=DECIMAL},
+            </if>
+            <if test="governmentSubsidy != null">
+                government_subsidy = #{governmentSubsidy,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.CheckInConfig">
+        update check_in_config
+        set elder_id                  = #{elderId,jdbcType=BIGINT},
+            check_in_start_time       = #{checkInStartTime,jdbcType=TIMESTAMP},
+            check_in_end_time         = #{checkInEndTime,jdbcType=TIMESTAMP},
+            nursing_level_id          = #{nursingLevelId,jdbcType=BIGINT},
+            bed_no                    = #{bedNo,jdbcType=VARCHAR},
+            cost_start_time           = #{costStartTime,jdbcType=TIMESTAMP},
+            cost_end_time             = #{costEndTime,jdbcType=TIMESTAMP},
+            deposit_amount            = #{depositAmount,jdbcType=DECIMAL},
+            nursing_cost              = #{nursingCost,jdbcType=DECIMAL},
+            bed_cost                  = #{bedCost,jdbcType=DECIMAL},
+            other_cost                = #{otherCost,jdbcType=DECIMAL},
+            medical_insurance_payment = #{medicalInsurancePayment,jdbcType=DECIMAL},
+            government_subsidy        = #{governmentSubsidy,jdbcType=DECIMAL},
+            create_time               = #{createTime,jdbcType=TIMESTAMP},
+            update_time               = #{updateTime,jdbcType=TIMESTAMP},
+            create_by                 = #{createBy,jdbcType=BIGINT},
+            update_by                 = #{updateBy,jdbcType=BIGINT},
+            remark                    = #{remark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

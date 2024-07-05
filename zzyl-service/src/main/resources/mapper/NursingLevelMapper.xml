@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.NursingLevelMapper">
+
+    <resultMap id="NursingLevelResultMap" type="com.zzyl.entity.NursingLevel">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="lplan_id" property="planId"/>
+        <result column="plan_name" property="planName"/>
+        <result column="fee" property="fee"/>
+        <result column="status" property="status"/>
+        <result column="description" property="description"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="creator" property="creator"/>
+    </resultMap>
+
+    <select id="listAll" resultMap="NursingLevelResultMap">
+        SELECT nl.id,
+               nl.name,
+               npp.plan_name AS plan_name,
+               nl.lplan_id,
+               nl.fee,
+               nl.status,
+               nl.description,
+               nl.create_by,
+               nl.update_by,
+               nl.remark,
+               nl.create_time,
+               nl.update_time
+        FROM nursing_level nl
+                 LEFT JOIN nursing_plan npp ON nl.lplan_id = npp.id
+        WHERE nl.status = 1
+        ORDER BY nl.create_by desc
+    </select>
+
+    <select id="listAllByPlanIds" resultMap="NursingLevelResultMap">
+        SELECT
+        nl.lplan_id
+        FROM
+        nursing_level nl
+
+        WHERE nl.lplan_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY
+        nl.create_by desc
+    </select>
+
+    <!-- 批量插入护理等级信息 -->
+    <insert id="insertBatch">
+        INSERT INTO nursing_level (name, lplan_id, fee, status, description, create_by, update_by, remark, create_time,
+        update_time)
+        VALUES
+        <foreach collection="nursingLevels" item="nursingLevel" separator=",">
+            (#{nursingLevel.name}, #{nursingLevel.planId}, #{nursingLevel.fee}, #{nursingLevel.status},
+            #{nursingLevel.description}, #{nursingLevel.createBy}, #{nursingLevel.updateBy}, #{nursingLevel.remark},
+            #{nursingLevel.createTime}, #{nursingLevel.updateTime})
+        </foreach>
+    </insert>
+
+    <!-- 根据id查询护理等级信息 -->
+    <select id="getById" resultMap="NursingLevelResultMap">
+        SELECT nl.id,
+               nl.name,
+               npp.plan_name AS plan_name,
+               nl.lplan_id,
+               nl.fee,
+               nl.status,
+               nl.description,
+               nl.create_by,
+               nl.update_by,
+               nl.remark,
+               nl.create_time,
+               nl.update_time
+        FROM nursing_level nl
+                 LEFT JOIN nursing_plan npp ON nl.lplan_id = npp.id
+        WHERE nl.id = #{id}
+    </select>
+
+    <!-- 更新护理等级信息 -->
+    <update id="update" parameterType="com.zzyl.entity.NursingLevel">
+        UPDATE nursing_level
+        SET name        = #{name},
+            lplan_id    = #{planId},
+            fee         = #{fee},
+            status      = #{status},
+            description = #{description},
+            update_by   = #{updateBy},
+            remark      = #{remark},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除护理等级信息 -->
+    <delete id="delete" parameterType="Long">
+        DELETE
+        FROM nursing_level
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 新增护理等级信息 -->
+    <insert id="insert" parameterType="com.zzyl.entity.NursingLevel">
+        INSERT INTO nursing_level (name, lplan_id, fee, status, description, create_by, update_by, remark, create_time,
+                                   update_time)
+        VALUES (#{name}, #{planId}, #{fee}, #{status}, #{description}, #{createBy}, #{updateBy}, #{remark},
+                #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="listByPage" resultMap="NursingLevelResultMap" parameterType="java.util.Map">
+        SELECT
+        nl.id,
+        nl.name,
+        npp.plan_name AS plan_name,
+        nl.lplan_id,
+        nl.fee,
+        nl.status,
+        nl.description,
+        nl.create_by,
+        nl.update_by,
+        nl.remark,
+        nl.create_time,
+        nl.update_time
+        ,s.real_name as creator
+        FROM
+        nursing_level nl
+        LEFT JOIN nursing_plan npp ON nl.lplan_id = npp.id
+        LEFT JOIN sys_user s ON nl.create_by = s.id
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+        <if test="status != null">
+            and nl.status = #{status, jdbcType=INTEGER}
+        </if>
+        ORDER BY
+        nl.create_time desc
+    </select>
+
+    <update id="updateStatus">
+        UPDATE nursing_level
+        SET status      = #{status},
+            update_time = #{updateTime},
+            update_by   = #{updateBy}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

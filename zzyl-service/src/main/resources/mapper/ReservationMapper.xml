@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zzyl.mapper.ReservationMapper">
+    <resultMap id="reservationMap" type="com.zzyl.entity.Reservation">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="mobile" property="mobile"/>
+        <result column="time" property="time"/>
+        <result column="visitor" property="visitor"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="creator" property="creator"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zzyl.entity.Reservation" useGeneratedKeys="true" keyProperty="id">
+        insert into reservation(name, mobile, time, visitor, type, status, create_by, remark, create_time)
+        values (#{name}, #{mobile}, #{time}, #{visitor}, #{type}, #{status}, #{createBy}, #{remark}, #{createTime})
+    </insert>
+
+    <update id="update" parameterType="com.zzyl.entity.Reservation">
+        update reservation
+        set name        = #{name},
+            mobile      = #{mobile},
+            time        = #{time},
+            visitor     = #{visitor},
+            type        = #{type},
+            status      = #{status},
+            update_time = #{updateTime},
+            update_by   = #{updateBy}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from reservation
+        where id = #{id}
+    </delete>
+
+    <select id="findById" parameterType="java.lang.Long" resultType="com.zzyl.entity.Reservation">
+        select *
+        from reservation
+        where id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="reservationMap">
+        select * from reservation
+        WHERE time BETWEEN #{startTime} AND #{endTime}
+        <if test="mobile != null and mobile != ''">
+            and mobile = #{mobile}
+        </if>
+        <if test="createBy != null">
+            AND create_by = #{createBy}
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="findByPage" parameterType="java.util.Map" resultType="com.zzyl.entity.Reservation">
+        select r.id, r.name, r.mobile, r.time, r.visitor, r.type, r.status, r.create_by, r.remark, r.create_time, s.name
+        as creator from reservation r
+        LEFT JOIN member s ON r.create_by = s.id
+        <where>
+            <if test="name != null and name != ''">
+                and r.name like concat('%',#{name},'%')
+            </if>
+            <if test="mobile != null and mobile != ''">
+                and r.mobile = #{mobile}
+            </if>
+            <if test="status != null">
+                and r.status = #{status, jdbcType=INTEGER}
+            </if>
+            <if test="type != null">
+                and r.type = #{type, jdbcType=INTEGER}
+            </if>
+            <if test="createBy != null">
+                AND r.create_by = #{createBy}
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND r.time BETWEEN #{startTime} AND #{endTime}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="countReservationsWithinTimeRange" resultType="int">
+        SELECT COUNT(*) FROM reservation
+        WHERE time BETWEEN #{startTime} AND #{endTime}
+        <if test="createBy != null">
+            AND create_by = #{createBy}
+        </if>
+        <if test="status != null">
+            and status = #{status, jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="countReservationsForEachTimeWithinTimeRange" resultType="com.zzyl.vo.TimeCountVo">
+        SELECT time, 6 - COUNT(*) AS count
+        FROM reservation
+        WHERE `time` BETWEEN #{startTime}
+          AND #{endTime}
+          and status != 2
+        GROUP BY time
+    </select>
+
+    <select id="countCancelledReservationsWithinTimeRange" resultType="int">
+        SELECT COUNT(*) FROM reservation
+        WHERE update_time BETWEEN #{startTime} AND #{endTime}
+        AND status = 2
+        and update_by = #{updateBy}
+    </select>
+</mapper>

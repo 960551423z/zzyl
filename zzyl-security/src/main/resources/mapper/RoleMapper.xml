@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Role">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
+        <result column="label" jdbcType="VARCHAR" property="label"/>
+        <result column="sort_no" jdbcType="INTEGER" property="sortNo"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="data_scope" jdbcType="CHAR" property="dataScope"/>
+    </resultMap>
+    <resultMap id="BaseResultVoMap" type="com.zzyl.vo.RoleVo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
+        <result column="label" jdbcType="VARCHAR" property="label"/>
+        <result column="sort_no" jdbcType="INTEGER" property="sortNo"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="data_scope" jdbcType="CHAR" property="dataScope"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , role_name, label, sort_no, data_state, create_time, update_time, remark, create_by,
+    update_by, data_scope
+    </sql>
+
+    <insert id="insert" parameterType="com.zzyl.entity.Role">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_role (role_name, label, sort_no,
+        data_state, create_time, update_time,
+        remark, create_by, update_by,
+        data_scope)
+        values (#{roleName,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR}, #{sortNo,jdbcType=INTEGER},
+        #{dataState,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+        #{dataScope,jdbcType=CHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.Role">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">
+                role_name,
+            </if>
+            <if test="label != null">
+                label,
+            </if>
+            <if test="sortNo != null">
+                sort_no,
+            </if>
+            <if test="dataState != null">
+                data_state,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="dataScope != null">
+                data_scope,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">
+                #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="label != null">
+                #{label,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="dataScope != null">
+                #{dataScope,jdbcType=CHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectPage" parameterType="com.zzyl.dto.RoleDto" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_role
+        <where>
+            <if test="roleDto.roleName!=null and roleDto.roleName!=''">
+                and role_name like concat('%',#{roleDto.roleName},'%')
+            </if>
+            <if test="roleDto.label!=null and roleDto.label!=''">
+                and label =#{roleDto.label}
+            </if>
+            <if test="roleDto.dataState!=null and roleDto.dataState!=''">
+                and data_state=#{roleDto.dataState}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="selectList" resultType="com.zzyl.entity.Role">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_role
+        <where>
+            <if test="roleVo.roleName!=null and roleVo.roleName!=''">
+                and role_name like concat('%',#{roleVo.roleName},'%')
+            </if>
+            <if test="roleVo.label!=null and roleVo.label!=''">
+                and label =#{roleVo.label}
+            </if>
+            <if test="roleVo.dataState!=null and roleVo.dataState!=''">
+                and data_state=#{roleVo.dataState}
+            </if>
+        </where>
+        order by sort_no asc
+    </select>
+    <select id="findRoleVoListByUserId" parameterType="java.lang.Long" resultMap="BaseResultVoMap">
+        SELECT r.id,
+               r.role_name,
+               r.label,
+               r.sort_no,
+               r.data_state,
+               r.create_by,
+               r.create_time,
+               r.update_by,
+               r.update_time,
+               r.remark,
+               r.data_scope
+        FROM sys_user_role ur
+                 LEFT JOIN sys_role r ON ur.role_id = r.id
+        WHERE r.data_state = '0'
+          AND ur.user_id = #{userId}
+    </select>
+    <select id="findRoleVoListInUserId" parameterType="java.util.List" resultMap="BaseResultVoMap">
+        SELECT r.id,r.role_name,r.label,r.sort_no,r.data_state,r.create_by,
+        r.create_time,r.update_by,r.update_time,ur.user_id,r.remark,r.data_scope
+        FROM sys_user_role ur
+        LEFT JOIN sys_role r ON ur.role_id = r.id
+        WHERE r.data_state = '0'
+        AND ur.user_id IN (
+        <foreach collection='userIds' separator=',' item='userId'>
+            #{userId}
+        </foreach>)
+    </select>
+    <select id="findRoleVoListByResourceNo" parameterType="java.lang.String" resultMap="BaseResultVoMap">
+        SELECT r.id,
+               r.role_name,
+               r.label,
+               r.sort_no,
+               r.data_state,
+               r.create_by,
+               r.create_time,
+               r.update_by,
+               r.update_time,
+               r.remark,
+               r.data_scope
+        FROM sys_role_resource rr
+                 LEFT JOIN sys_role r ON rr.role_id = r.id
+        WHERE r.data_state = '0'
+          AND rr.resource_no = #{resourceNo}
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.Role">
+        update sys_role
+        <set>
+            <if test="roleName != null">
+                role_name = #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="label != null">
+                label = #{label,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="dataScope != null">
+                data_scope = #{dataScope,jdbcType=CHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteRoleByIds" parameterType="Long">
+        delete from sys_role where id in
+        <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+</mapper>

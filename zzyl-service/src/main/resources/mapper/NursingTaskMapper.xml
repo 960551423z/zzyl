@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.NursingTaskMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.NursingTask">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="nursing_id" jdbcType="BIGINT" property="nursingId"/>
+        <result column="project_id" jdbcType="INTEGER" property="projectId"/>
+        <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+        <result column="bed_number" jdbcType="VARCHAR" property="bedNumber"/>
+        <result column="task_type" jdbcType="TINYINT" property="taskType"/>
+        <result column="estimated_server_time" jdbcType="TIMESTAMP" property="estimatedServerTime"/>
+        <result column="mark" jdbcType="VARCHAR" property="mark"/>
+        <result column="cancel_reason" jdbcType="VARCHAR" property="cancelReason"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="rel_no" jdbcType="VARCHAR" property="relNo"/>
+        <result column="task_image" jdbcType="VARCHAR" property="taskImage"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="ename" jdbcType="VARCHAR" property="elderName"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="age" jdbcType="VARCHAR" property="age"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="updater" jdbcType="VARCHAR" property="updater"/>
+        <result column="pname" jdbcType="VARCHAR" property="projectName"/>
+        <result column="ne_elder_id" jdbcType="VARCHAR"/>
+        <collection property="nursingName" ofType="java.lang.String" column="ne_elder_id"
+                    select="com.zzyl.mapper.NursingElderMapper.selectNameByElderId">
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , nursing_id, project_id, elder_id, bed_number, task_type, estimated_server_time,
+    mark, cancel_reason, status, rel_no, task_image, create_time, update_time, create_by, 
+    update_by, remark
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select n.id,
+               n.nursing_id,
+               n.project_id,
+               n.elder_id,
+               n.task_type,
+               n.estimated_server_time,
+               n.mark,
+               n.cancel_reason,
+               n.status,
+               n.rel_no,
+               n.task_image,
+               n.create_time,
+               n.update_time,
+               n.create_by,
+               n.update_by,
+               n.remark,
+               e.name            as ename,
+               e.age             as age,
+               e.sex             as sex,
+               e.image           as image,
+               m.name            as creator,
+               adminuu.real_name as updater,
+               u.real_name       as nname,
+               p.name            as pname,
+               b.bed_number
+        from nursing_task n
+                 left join elder e on e.id = n.elder_id
+                 LEFT JOIN sys_user u ON n.nursing_id = u.id
+                 LEFT JOIN member m ON n.create_by = m.id
+                 LEFT JOIN sys_user adminuu ON n.update_by = adminuu.id
+                 left join nursing_project p on n.project_id = p.id
+                 left join bed b on b.id = e.bed_id
+        where n.id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from nursing_task
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zzyl.entity.NursingTask">
+        delete from nursing_task
+        <where>
+            <if test="elderId != null">
+                and elder_id = #{elderId,jdbcType=BIGINT}
+            </if>
+            <if test="status != null">
+                and status= #{status,jdbcType=BIGINT}
+            </if>
+        </where>
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.NursingTask">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into nursing_task (nursing_id, project_id, elder_id,
+        bed_number, task_type, estimated_server_time,
+        mark, cancel_reason, status,
+        rel_no, task_image, create_time,
+        update_time, create_by, update_by,
+        remark)
+        values (#{nursingId,jdbcType=BIGINT}, #{projectId,jdbcType=INTEGER}, #{elderId,jdbcType=BIGINT},
+        #{bedNumber,jdbcType=VARCHAR}, #{taskType,jdbcType=TINYINT}, #{estimatedServerTime,jdbcType=TIMESTAMP},
+        #{mark,jdbcType=VARCHAR}, #{cancelReason,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+        #{relNo,jdbcType=VARCHAR}, #{taskImage,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.NursingTask">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into nursing_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="nursingId != null">
+                nursing_id,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="elderId != null">
+                elder_id,
+            </if>
+            <if test="bedNumber != null">
+                bed_number,
+            </if>
+            <if test="taskType != null">
+                task_type,
+            </if>
+            <if test="estimatedServerTime != null">
+                estimated_server_time,
+            </if>
+            <if test="mark != null">
+                mark,
+            </if>
+            <if test="cancelReason != null">
+                cancel_reason,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="relNo != null">
+                rel_no,
+            </if>
+            <if test="taskImage != null">
+                task_image,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="nursingId != null">
+                #{nursingId,jdbcType=BIGINT},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="elderId != null">
+                #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="bedNumber != null">
+                #{bedNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="taskType != null">
+                #{taskType,jdbcType=TINYINT},
+            </if>
+            <if test="estimatedServerTime != null">
+                #{estimatedServerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="mark != null">
+                #{mark,jdbcType=VARCHAR},
+            </if>
+            <if test="cancelReason != null">
+                #{cancelReason,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="relNo != null">
+                #{relNo,jdbcType=VARCHAR},
+            </if>
+            <if test="taskImage != null">
+                #{taskImage,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="selectByIds" resultType="com.zzyl.entity.NursingTask">
+        select
+        <include refid="Base_Column_List"/>
+        from nursing_task
+        and id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.NursingTask">
+        update nursing_task
+        <set>
+            <if test="nursingId != null">
+                nursing_id = #{nursingId,jdbcType=BIGINT},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="bedNumber != null">
+                bed_number = #{bedNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="taskType != null">
+                task_type = #{taskType,jdbcType=TINYINT},
+            </if>
+            <if test="estimatedServerTime != null">
+                estimated_server_time = #{estimatedServerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="mark != null">
+                mark = #{mark,jdbcType=VARCHAR},
+            </if>
+            <if test="cancelReason != null">
+                cancel_reason = #{cancelReason,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="relNo != null">
+                rel_no = #{relNo,jdbcType=VARCHAR},
+            </if>
+            <if test="taskImage != null">
+                task_image = #{taskImage,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.NursingTask">
+        update nursing_task
+        set nursing_id            = #{nursingId,jdbcType=BIGINT},
+            project_id            = #{projectId,jdbcType=INTEGER},
+            elder_id              = #{elderId,jdbcType=BIGINT},
+            bed_number            = #{bedNumber,jdbcType=VARCHAR},
+            task_type             = #{taskType,jdbcType=TINYINT},
+            estimated_server_time = #{estimatedServerTime,jdbcType=TIMESTAMP},
+            mark                  = #{mark,jdbcType=VARCHAR},
+            cancel_reason         = #{cancelReason,jdbcType=VARCHAR},
+            status                = #{status,jdbcType=INTEGER},
+            rel_no                = #{relNo,jdbcType=VARCHAR},
+            task_image            = #{taskImage,jdbcType=VARCHAR},
+            create_time           = #{createTime,jdbcType=TIMESTAMP},
+            update_time           = #{updateTime,jdbcType=TIMESTAMP},
+            create_by             = #{createBy,jdbcType=BIGINT},
+            update_by             = #{updateBy,jdbcType=BIGINT},
+            remark                = #{remark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByBillNoSelective">
+        update nursing_task
+        set
+        status = 3
+        where rel_no in
+        <foreach close=")" collection="roleIds" item="roleId" open="(" separator=",">
+            #{roleId}
+        </foreach>
+        and status = 1
+    </update>
+    <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into nursing_task (nursing_id, project_id, elder_id, bed_number, task_type, estimated_server_time, mark,
+        cancel_reason, status, rel_no, task_image, create_time, update_time, create_by, update_by, remark)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.nursingId,jdbcType=BIGINT}, #{item.projectId,jdbcType=INTEGER}, #{item.elderId,jdbcType=BIGINT},
+            #{item.bedNumber,jdbcType=VARCHAR}, #{item.taskType,jdbcType=TINYINT},
+            #{item.estimatedServerTime,jdbcType=TIMESTAMP}, #{item.mark,jdbcType=VARCHAR},
+            #{item.cancelReason,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER}, #{item.relNo,jdbcType=VARCHAR},
+            #{item.taskImage,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
+            #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <select id="selectByParams" parameterType="map" resultMap="BaseResultMap">
+        select
+        n.id, n.nursing_id, n.project_id, n.elder_id, n.task_type, n.estimated_server_time,
+        n.mark, n.cancel_reason, n.status, n.rel_no, n.task_image, n.create_time, n.update_time, n.create_by,
+        n.update_by, n.remark,
+        e.name as ename
+        ,m.name as creator
+        ,adminuu.real_name as updater
+        ,p.name as pname,
+        b.bed_number
+        ,ne.elder_id as ne_elder_id
+        from nursing_task n
+        left join elder e on e.id = n.elder_id
+        LEFT JOIN member m ON n.create_by = m.id
+        LEFT JOIN sys_user adminuu ON n.update_by = adminuu.id
+        left join nursing_project p on n.project_id = p.id
+        left join bed b on b.id = e.bed_id
+        left join nursing_elder ne on n.elder_id = ne.elder_id
+        <where>
+            <if test="elderName != null">
+                e.name = #{elderName,jdbcType=VARCHAR}
+            </if>
+            <if test="nurseId != null and nurseId != ''">
+                and ne.nursing_id = #{nurseId,jdbcType=BIGINT}
+            </if>
+            <if test="projectId != null">
+                and n.project_id = #{projectId,jdbcType=INTEGER}
+            </if>
+            <if test="startTime != null">
+                and n.estimated_server_time &gt;= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null">
+                and n.estimated_server_time &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="status != null">
+                and n.status = #{status,jdbcType=INTEGER}
+            </if>
+        </where>
+        group by n.id
+        order by n.estimated_server_time asc, n.id desc
+    </select>
+</mapper>

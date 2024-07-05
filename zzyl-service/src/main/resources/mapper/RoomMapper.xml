@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.RoomMapper">
+
+    <resultMap id="roomResultMap" type="com.zzyl.entity.Room">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="sort" column="sort"/>
+        <result property="sort" column="sort"/>
+        <result property="floorId" column="floor_id"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="roomVoResultMap" type="com.zzyl.vo.RoomVo">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="sort" column="sort"/>
+        <result property="sort" column="sort"/>
+        <result property="floorId" column="floor_id"/>
+        <result property="floorName" column="fname"/>
+
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="price" property="price"/>
+        <collection property="bedVoList" ofType="com.zzyl.vo.BedVo">
+            <id column="bid" property="id"/>
+            <result column="bed_number" property="bedNumber"/>
+            <result column="bed_status" property="bedStatus"/>
+            <result column="room_id" property="roomId"/>
+            <result column="lname" property="lname"/>
+            <result column="ename" property="name"/>
+            <result column="eid" property="elderId"/>
+            <collection property="checkInConfigVo" ofType="com.zzyl.vo.CheckInConfigVo">
+                <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+                <result column="check_in_start_time" jdbcType="TIMESTAMP" property="checkInStartTime"/>
+                <result column="check_in_end_time" jdbcType="TIMESTAMP" property="checkInEndTime"/>
+                <result column="nursing_level_id" jdbcType="BIGINT" property="nursingLevelId"/>
+                <result column="bed_no" jdbcType="VARCHAR" property="bedNo"/>
+                <result column="cost_start_time" jdbcType="TIMESTAMP" property="costStartTime"/>
+                <result column="cost_end_time" jdbcType="TIMESTAMP" property="costEndTime"/>
+                <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+                <result column="nursing_cost" jdbcType="DECIMAL" property="nursingCost"/>
+                <result column="bed_cost" jdbcType="DECIMAL" property="bedCost"/>
+                <result column="other_cost" jdbcType="DECIMAL" property="otherCost"/>
+                <result column="medical_insurance_payment" jdbcType="DECIMAL" property="medicalInsurancePayment"/>
+                <result column="government_subsidy" jdbcType="DECIMAL" property="governmentSubsidy"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <resultMap id="roomVoWithNurResultMap" type="com.zzyl.vo.RoomVo">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="sort" column="sort"/>
+        <result property="sort" column="sort"/>
+        <result property="floorId" column="floor_id"/>
+        <result property="floorName" column="fname"/>
+
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="price" property="price"/>
+        <collection property="bedVoList" ofType="com.zzyl.vo.BedVo">
+            <id column="bid" property="id"/>
+            <result column="bed_number" property="bedNumber"/>
+            <result column="bed_status" property="bedStatus"/>
+            <result column="room_id" property="roomId"/>
+            <result column="ename" property="name"/>
+            <result column="eid" property="elderId"/>
+            <collection property="userVos" ofType="com.zzyl.vo.UserVo" column="eid"
+                        select="com.zzyl.mapper.NursingElderMapper.selectUserByElderId">
+                <result column="real_name" property="realName"/>
+                <result column="uid" property="id"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectById" resultMap="roomResultMap">
+        SELECT *
+        FROM room
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="roomResultMap">
+        SELECT *
+        FROM room
+        order by sort
+    </select>
+
+    <insert id="insert" parameterType="com.zzyl.entity.Room">
+        INSERT INTO room (code, sort, type_name, floor_id, create_by, update_by, remark, create_time, update_time)
+        VALUES (#{code}, #{sort}, #{typeName}, #{floorId}, #{createBy}, #{updateBy}, #{remark}, #{createTime},
+                #{updateTime})
+    </insert>
+
+    <update id="updateById" parameterType="com.zzyl.entity.Room">
+        UPDATE room
+        SET code        = #{code},
+            sort        = #{sort},
+            type_name   = #{typeName},
+            update_time = #{updateTime},
+            update_by   = #{updateBy}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE
+        FROM room
+        WHERE id = #{id}
+    </delete>
+    <select id="selectRoomsByFloorId" parameterType="java.lang.Long" resultType="com.zzyl.entity.Room">
+        SELECT *
+        FROM room
+        WHERE floor_id = #{floorId}
+        order by sort, create_time desc
+    </select>
+
+    <select id="countRoomByTypeName" parameterType="java.lang.String" resultType="map">
+        SELECT type_name, count(*) as 'count' FROM room WHERE type_name in
+        <foreach collection="list" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+        group by type_name
+    </select>
+
+    <select id="selectByFloorId" resultMap="roomVoResultMap">
+        select r.*,
+               f.name  as fname,
+               rt.*,
+               b.id    as bid,
+               b.bed_number,
+               b.sort,
+               b.bed_status,
+               b.room_id,
+               b.create_by,
+               b.update_by,
+               b.remark,
+               b.create_time,
+               b.update_time,
+               e.name  as ename,
+               e.id    as eid,
+               nl.name as lname,
+               cc.*
+        from room r
+                 left join floor f on f.id = r.floor_id
+                 left join room_type rt on rt.name = r.type_name
+                 left join bed b on b.room_id = r.id
+                 left join elder e on b.id = e.bed_id
+                 left join check_in_config cc on cc.elder_id = e.id
+                 left join nursing_level nl on nl.id = cc.nursing_level_id
+        where r.floor_id = #{floorId}
+        order by r.sort, r.create_time desc
+    </select>
+
+    <select id="selectByFloorIdWithNur" resultMap="roomVoWithNurResultMap">
+        select r.*,
+               b.id   as bid,
+               b.bed_number,
+               b.sort,
+               b.bed_status,
+               b.room_id,
+               b.create_by,
+               b.update_by,
+               b.remark,
+               b.create_time,
+               b.update_time,
+               e.name as ename,
+               e.id   as eid
+        from room r
+                 left join bed b on b.room_id = r.id
+                 left join elder e on e.bed_id = b.id
+        where r.floor_id = #{floorId}
+          and e.id is not null
+        order by r.sort, r.create_time desc
+    </select>
+
+    <resultMap id="roomVoWithDeviceResultMap" type="com.zzyl.vo.RoomVo">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="sort" column="sort"/>
+        <result property="sort" column="sort"/>
+        <result property="floorId" column="floor_id"/>
+        <result property="floorName" column="fname"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="price" property="price"/>
+        <collection property="bedVoList" ofType="com.zzyl.vo.BedVo">
+            <id column="bid" property="id"/>
+            <result column="bed_number" property="bedNumber"/>
+            <result column="bed_status" property="bedStatus"/>
+            <result column="room_id" property="roomId"/>
+            <result column="ename" property="name"/>
+            <result column="eid" property="elderId"/>
+            <collection property="deviceVos" ofType="com.zzyl.vo.DeviceVo">
+                <id column="b_did" jdbcType="BIGINT" property="id"/>
+                <result column="b_device_id" jdbcType="VARCHAR" property="deviceId"/>
+                <result column="b_device_name" jdbcType="VARCHAR" property="deviceName"/>
+                <result column="b_product_key" jdbcType="VARCHAR" property="productKey"/>
+                <result column="b_produce_name" jdbcType="BIT" property="productName"/>
+            </collection>
+        </collection>
+        <collection property="deviceVos" ofType="com.zzyl.vo.DeviceVo">
+            <id column="r_did" jdbcType="BIGINT" property="id"/>
+            <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+            <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+            <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
+            <result column="produce_name" jdbcType="BIT" property="productName"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectByFloorIdWithDevice" resultMap="roomVoWithDeviceResultMap">
+        select r.*,
+               b.id            as bid,
+               b.bed_number,
+               b.sort,
+               b.bed_status,
+               b.room_id,
+               b.create_by,
+               b.update_by,
+               b.remark,
+               b.create_time,
+               b.update_time,
+               e.name          as ename,
+               e.id            as eid,
+               d.id            as r_did,
+               d.device_id,
+               d.product_id    as product_key,
+               d.device_name,
+               d.produce_name,
+               db.id           as b_did,
+               db.device_id    as b_device_id,
+               db.product_id   as b_product_key,
+               db.device_name  as b_device_name,
+               db.produce_name as b_produce_name
+        from room r
+                 left join bed b on b.room_id = r.id
+                 left join elder e on e.bed_id = b.id
+                 left join device d
+                           on d.binding_location = r.id and d.location_type = 1 and d.physical_location_type = 1
+                 left join device db
+                           on db.binding_location = b.id and db.location_type = 1 and db.physical_location_type = 2
+        where r.floor_id = #{floorId}
+          and (d.id is not null or db.id is not null)
+        order by r.sort, r.create_time desc
+    </select>
+
+
+    <select id="selectRoomsCheckedByFloorId" resultMap="roomVoResultMap">
+        select r.*,
+               f.name  as fname,
+               rt.*,
+               b.id    as bid,
+               b.bed_number,
+               b.sort,
+               b.bed_status,
+               b.room_id,
+               b.create_by,
+               b.update_by,
+               b.remark,
+               b.create_time,
+               b.update_time,
+               e.name  as ename,
+               e.id    as eid,
+               nl.name as lname,
+               cc.*
+        from room r
+                 left join floor f on f.id = r.floor_id
+                 left join room_type rt on rt.name = r.type_name
+                 left join bed b on b.room_id = r.id
+                 left join bed_elder bd on bd.bed_id = b.id
+                 left join elder e on bd.elder_id = e.id
+                 left join check_in_config cc on cc.elder_id = e.id
+                 left join nursing_level nl on nl.id = cc.nursing_level_id
+        where r.floor_id = #{floorId}
+          and b.bed_status = 1
+        order by r.sort, r.create_time desc
+
+    </select>
+</mapper>

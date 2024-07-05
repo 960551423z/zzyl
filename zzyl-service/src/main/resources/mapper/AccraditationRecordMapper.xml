@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.AccraditationRecordMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.AccraditationRecord">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="opinion" jdbcType="VARCHAR" property="opinion"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="approver_id" jdbcType="BIGINT" property="approverId"/>
+        <result column="approver_name" jdbcType="VARCHAR" property="approverName"/>
+        <result column="bussniess_id" jdbcType="BIGINT" property="bussniessId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.zzyl.entity.AccraditationRecord">
+        insert into accraditation_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="opinion != null">
+                opinion,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="approverId != null">
+                approver_id,
+            </if>
+            <if test="approverName != null">
+                approver_name,
+            </if>
+            <if test="approverNameRole != null">
+                approver_name_role,
+            </if>
+            <if test="bussniessId != null">
+                bussniess_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="auditStatus != null">
+                audit_status,
+            </if>
+            <if test="nextApprover != null">
+                next_approver,
+            </if>
+            <if test="nextApproverId != null">
+                next_approver_id,
+            </if>
+            <if test="nextApproverRole != null">
+                next_approver_role,
+            </if>
+            <if test="currentStep != null">
+                current_step,
+            </if>
+            <if test="stepNo != null">
+                step_no,
+            </if>
+            <if test="handleType != null">
+                handle_type,
+            </if>
+            <if test="nextStep != null">
+                next_step,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="opinion != null">
+                #{opinion},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="approverId != null">
+                #{approverId},
+            </if>
+            <if test="approverName != null">
+                #{approverName},
+            </if>
+            <if test="approverNameRole != null">
+                #{approverNameRole},
+            </if>
+            <if test="bussniessId != null">
+                #{bussniessId},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="auditStatus != null">
+                #{auditStatus},
+            </if>
+            <if test="nextApprover != null">
+                #{nextApprover},
+            </if>
+            <if test="nextApproverId != null">
+                #{nextApproverId},
+            </if>
+            <if test="nextApproverRole != null">
+                #{nextApproverRole},
+            </if>
+            <if test="currentStep != null">
+                #{currentStep},
+            </if>
+            <if test="stepNo != null">
+                #{stepNo},
+            </if>
+            <if test="handleType != null">
+                #{handleType},
+            </if>
+            <if test="nextStep != null">
+                #{nextStep},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

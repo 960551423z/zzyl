@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.BillMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Bill">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="bill_no" jdbcType="VARCHAR" property="billNo"/>
+        <result column="bill_type" jdbcType="TINYINT" property="billType"/>
+        <result column="bill_month" jdbcType="VARCHAR" property="billMonth"/>
+        <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+        <result column="bill_amount" jdbcType="DECIMAL" property="billAmount"/>
+        <result column="payable_amount" jdbcType="DECIMAL" property="payableAmount"/>
+        <result column="prepaid_amount" jdbcType="DECIMAL" property="prepaidAmount"/>
+        <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+        <result column="current_cost" jdbcType="DECIMAL" property="currentCost"/>
+        <result column="payment_deadline" jdbcType="TIMESTAMP" property="paymentDeadline"/>
+        <result column="transaction_status" jdbcType="INTEGER" property="transactionStatus"/>
+        <result column="bill_start_time" jdbcType="TIMESTAMP" property="billStartTime"/>
+        <result column="bill_end_time" jdbcType="TIMESTAMP" property="billEndTime"/>
+        <result column="total_days" jdbcType="INTEGER" property="totalDays"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="bcreator" property="creator"/>
+        <result column="bupdater" property="updater"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="trading_order_no" jdbcType="BIGINT" property="tradingOrderNo"/>
+        <result column="lname" property="lname"/>
+        <result column="type_name" property="typeName"/>
+        <result column="total" property="total"/>
+        <collection property="elderVo" ofType="com.zzyl.vo.retreat.ElderVo">
+            <id column="id" jdbcType="BIGINT" property="id"/>
+            <result column="ename" jdbcType="VARCHAR" property="name"/>
+            <result column="id_card_no" jdbcType="VARCHAR" property="idCardNo"/>
+        </collection>
+        <collection property="bedVo" ofType="com.zzyl.vo.BedVo">
+            <id column="id" property="id"/>
+            <result column="bed_number" property="bedNumber"/>
+        </collection>
+        <collection property="checkInConfigVo" ofType="com.zzyl.vo.CheckInConfigVo">
+            <id column="id" jdbcType="BIGINT" property="id"/>
+            <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+            <result column="check_in_start_time" jdbcType="TIMESTAMP" property="checkInStartTime"/>
+            <result column="check_in_end_time" jdbcType="TIMESTAMP" property="checkInEndTime"/>
+            <result column="nursing_level_id" jdbcType="BIGINT" property="nursingLevelId"/>
+            <result column="bed_no" jdbcType="VARCHAR" property="bedNo"/>
+            <result column="cost_start_time" jdbcType="TIMESTAMP" property="costStartTime"/>
+            <result column="cost_end_time" jdbcType="TIMESTAMP" property="costEndTime"/>
+            <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+            <result column="nursing_cost" jdbcType="DECIMAL" property="nursingCost"/>
+            <result column="bed_cost" jdbcType="DECIMAL" property="bedCost"/>
+            <result column="other_cost" jdbcType="DECIMAL" property="otherCost"/>
+            <result column="medical_insurance_payment" jdbcType="DECIMAL" property="medicalInsurancePayment"/>
+            <result column="government_subsidy" jdbcType="DECIMAL" property="governmentSubsidy"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        b.id
+        , b.bill_no, b.bill_type, b.bill_month, b.elder_id, b.bill_amount, b.payable_amount, b.prepaid_amount,
+    b.deposit_amount, b.current_cost, b.payment_deadline, b.transaction_status, b.bill_start_time,
+    b.bill_end_time, b.total_days, b.create_time, b.update_time, b.create_by, b.update_by, b.remark, b.trading_order_no, b.lname, b.type_name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        , e.name as ename, e.id_card_no as id_card_no, s.real_name as bcreator, u.real_name as bupdater
+        , cc.*
+        , t.id as tid, t.product_order_no, t.trading_order_no,
+        t.trading_channel, t.trading_type, t.trading_state,
+        t.payee_name, t.payee_id, t.payer_name,
+        t.payer_id, t.trading_amount, t.refund,
+        t.is_refund, t.result_code, t.result_msg,
+        t.result_json, t.place_order_code, t.place_order_msg,
+        t.enterprise_id, t.memo, t.open_id,
+        t.enable_flag,
+        t.create_by as tcreate_by, t.update_by, t.remark as tremark,
+        t.place_order_json, t.qr_code
+        , t.create_time as tcreate_time
+        ,t.update_time as tupdate_time
+        , rr.memo as rrmemo , rr.refund_status as refund_status, rr.create_by as rrcreate_by,rr.refund_code,
+        rr.refund_no, rr.refund_amount, rr.refund_msg, rr.refund_code, rr.refund_msg, rr.create_type, rr.remark as
+        rrremark, rr.create_time as rrcreate_time
+        , rr.product_order_no as rr_product_order_no,
+        tu.real_name as tcreator
+        , mtk.name as member_creator
+        , mtk.phone as phone
+        , mtkTT.name as rr_member_creator
+        , adminu.real_name as admin_creator
+        FROM
+        bill b
+        left join elder e on b.elder_id = e.id
+        left join check_in_config cc on b.elder_id = cc.elder_id
+        LEFT JOIN sys_user s ON b.create_by = s.id
+        LEFT JOIN sys_user u ON b.update_by = u.id
+        left join trading t on t.product_order_no = b.id and t.trading_type = 1
+        left join sys_user tu ON t.create_by = tu.id
+        left join refund_record rr on rr.product_order_no = b.id and t.trading_type = 1
+        left join sys_user adminu ON rr.create_by = adminu.id
+        left join member mtk on mtk.id = t.create_by
+        left join member mtkTT on mtkTT.id = rr.create_by
+        where b.id = #{id,jdbcType=BIGINT}
+
+    </select>
+    <delete id="deleteByElderId" parameterType="java.lang.Long">
+        delete
+        from bill
+        where elder_id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.Bill">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into bill (bill_no, trading_order_no, bill_type, bill_month,
+        elder_id, bill_amount, payable_amount,
+        prepaid_amount, deposit_amount, current_cost,
+        payment_deadline, transaction_status, bill_start_time,
+        bill_end_time, total_days, create_time,
+        update_time, create_by, update_by, lname, type_name,
+        remark)
+        values (#{billNo,jdbcType=VARCHAR}, #{tradingOrderNo,jdbcType=BIGINT}, #{billType,jdbcType=TINYINT},
+        #{billMonth,jdbcType=VARCHAR},
+        #{elderId,jdbcType=BIGINT}, #{billAmount,jdbcType=DECIMAL}, #{payableAmount,jdbcType=DECIMAL},
+        #{prepaidAmount,jdbcType=DECIMAL}, #{depositAmount,jdbcType=DECIMAL}, #{currentCost,jdbcType=DECIMAL},
+        #{paymentDeadline,jdbcType=TIMESTAMP}, #{transactionStatus,jdbcType=INTEGER},
+        #{billStartTime,jdbcType=TIMESTAMP},
+        #{billEndTime,jdbcType=TIMESTAMP}, #{totalDays,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+        #{lname,jdbcType=VARCHAR} , #{typeName,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.Bill">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="billNo != null">
+                bill_no,
+            </if>
+            <if test="billType != null">
+                bill_type,
+            </if>
+            <if test="billMonth != null">
+                bill_month,
+            </if>
+            <if test="elderId != null">
+                elder_id,
+            </if>
+            <if test="billAmount != null">
+                bill_amount,
+            </if>
+            <if test="payableAmount != null">
+                payable_amount,
+            </if>
+            <if test="prepaidAmount != null">
+                prepaid_amount,
+            </if>
+            <if test="prepaidAmount != null">
+                deposit_amount,
+            </if>
+            <if test="currentCost != null">
+                current_cost,
+            </if>
+            <if test="paymentDeadline != null">
+                payment_deadline,
+            </if>
+            <if test="transactionStatus != null">
+                transaction_status,
+            </if>
+            <if test="billStartTime != null">
+                bill_start_time,
+            </if>
+            <if test="billEndTime != null">
+                bill_end_time,
+            </if>
+            <if test="totalDays != null">
+                total_days,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="billNo != null">
+                #{billNo,jdbcType=VARCHAR},
+            </if>
+            <if test="billType != null">
+                #{billType,jdbcType=TINYINT},
+            </if>
+            <if test="billMonth != null">
+                #{billMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="elderId != null">
+                #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="billAmount != null">
+                #{billAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="payableAmount != null">
+                #{payableAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="currentCost != null">
+                #{currentCost,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentDeadline != null">
+                #{paymentDeadline,jdbcType=TIMESTAMP},
+            </if>
+            <if test="transactionStatus != null">
+                #{transactionStatus,jdbcType=INTEGER},
+            </if>
+            <if test="billStartTime != null">
+                #{billStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="billEndTime != null">
+                #{billEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="totalDays != null">
+                #{totalDays,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateBytradingOrderNoSelective" parameterType="com.zzyl.entity.Bill">
+        update bill
+        <set>
+            <if test="billNo != null">
+                bill_no = #{billNo,jdbcType=VARCHAR},
+            </if>
+            <if test="billType != null">
+                bill_type = #{billType,jdbcType=TINYINT},
+            </if>
+            <if test="billMonth != null">
+                bill_month = #{billMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="billAmount != null">
+                bill_amount = #{billAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="payableAmount != null">
+                payable_amount = #{payableAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                prepaid_amount = #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                deposit_amount = #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="currentCost != null">
+                current_cost = #{currentCost,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentDeadline != null">
+                payment_deadline = #{paymentDeadline,jdbcType=TIMESTAMP},
+            </if>
+            <if test="transactionStatus != null">
+                transaction_status = #{transactionStatus,jdbcType=INTEGER},
+            </if>
+            <if test="billStartTime != null">
+                bill_start_time = #{billStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="billEndTime != null">
+                bill_end_time = #{billEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="totalDays != null">
+                total_days = #{totalDays,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where trading_order_no = #{tradingOrderNo,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Bill">
+        update bill
+        <set>
+            <if test="tradingOrderNo != null">
+                trading_order_no = #{tradingOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="billNo != null">
+                bill_no = #{billNo,jdbcType=VARCHAR},
+            </if>
+            <if test="billType != null">
+                bill_type = #{billType,jdbcType=TINYINT},
+            </if>
+            <if test="billMonth != null">
+                bill_month = #{billMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="billAmount != null">
+                bill_amount = #{billAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="payableAmount != null">
+                payable_amount = #{payableAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                prepaid_amount = #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                deposit_amount = #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="currentCost != null">
+                current_cost = #{currentCost,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentDeadline != null">
+                payment_deadline = #{paymentDeadline,jdbcType=TIMESTAMP},
+            </if>
+            <if test="transactionStatus != null">
+                transaction_status = #{transactionStatus,jdbcType=INTEGER},
+            </if>
+            <if test="billStartTime != null">
+                bill_start_time = #{billStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="billEndTime != null">
+                bill_end_time = #{billEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="totalDays != null">
+                total_days = #{totalDays,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="page" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        , e.name as ename, e.id_card_no as id_card_no
+        FROM
+        bill b
+        left join elder e on b.elder_id = e.id
+        <where>
+            <if test="billNo != null ">
+                AND b.bill_no = #{billNo}
+            </if>
+            <if test="elderName != null ">
+                AND e.name = #{elderName}
+            </if>
+            <if test="elderIdCard != null ">
+                AND e.id_card_no = #{elderIdCard}
+            </if>
+            <if test="startTime != null ">
+                and b.bill_start_time &gt;= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null ">
+                and b.bill_end_time &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="transactionStatus != null ">
+                AND b.transaction_status = #{transactionStatus}
+            </if>
+
+            <if test="elderIds != null ">
+                and b.elder_id in
+                <foreach close=")" collection="elderIds" item="elderId" open="(" separator=",">
+                    #{elderId}
+                </foreach>
+                AND b.bill_type = 0
+            </if>
+        </where>
+        ORDER BY b.create_time DESC
+    </select>
+
+
+    <select id="selectDepositByEldersAndStatus" resultType="com.zzyl.entity.Bill">
+        select * from bill where elder_id in(
+        <foreach collection='elderIds' separator=',' item='elderId'>
+            #{elderId}
+        </foreach>)
+        and transaction_status >= #{status} and deposit_amount > 0 and bill_type = 0 limit 1
+    </select>
+
+
+    <select id="arrears" resultMap="BaseResultMap">
+        SELECT b.elder_id, b.payment_deadline,
+        e.name as ename, e.id_card_no as id_card_no
+        , bed.* ,
+        SUM(b.payable_amount) AS total
+        FROM
+        bill b
+        left join elder e on b.elder_id = e.id
+        left join bed bed on bed.id = e.bed_id
+        <where>
+            <if test="bedNo != null ">
+                AND bed.bed_number = #{bedNo}
+            </if>
+            <if test="elderName != null ">
+                AND e.name = #{elderName}
+            </if>
+            and transaction_status = 0
+            and sysdate() > b.payment_deadline
+        </where>
+        group by elder_id
+        ORDER BY b.create_time DESC
+    </select>
+    <select id="selectBytradingOrderNo" resultType="com.zzyl.entity.Bill">
+        select * from `bill`
+        where trading_order_no in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item,jdbcType=BIGINT}
+        </foreach>
+
+        and bill_type = 1
+    </select>
+
+    <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+
+        insert into bill (bill_no, bill_type, bill_month, elder_id, bill_amount, payable_amount, prepaid_amount,
+        deposit_amount, current_cost, payment_deadline, transaction_status, bill_start_time, bill_end_time, total_days,
+        create_time, update_time, create_by, update_by, remark)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.billNo,jdbcType=VARCHAR}, #{item.billType,jdbcType=TINYINT}, #{item.billMonth,jdbcType=VARCHAR},
+            #{item.elderId,jdbcType=BIGINT}, #{item.billAmount,jdbcType=DECIMAL},
+            #{item.payableAmount,jdbcType=DECIMAL}, #{item.prepaidAmount,jdbcType=DECIMAL},
+            #{item.prepaidAmount,jdbcType=DECIMAL}, #{item.currentCost,jdbcType=DECIMAL},
+            #{item.paymentDeadline,jdbcType=TIMESTAMP}, #{item.transactionStatus,jdbcType=INTEGER},
+            #{item.billStartTime,jdbcType=TIMESTAMP}, #{item.billEndTime,jdbcType=TIMESTAMP},
+            #{item.totalDays,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
+            #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+
+    <update id="batchUpdateByTradingOrderNoSelective">
+        update bill
+        <set>
+
+            <if test="transactionStatus != null">
+                transaction_status = #{transactionStatus,jdbcType=INTEGER},
+            </if>
+            payable_amount = 0,
+        </set>
+        where trading_order_no in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item,jdbcType=BIGINT}
+        </foreach>
+    </update>
+    <update id="updateByIdSelective" parameterType="com.zzyl.entity.Bill">
+        update bill
+        <set>
+            <if test="billNo != null">
+                bill_no = #{billNo,jdbcType=VARCHAR},
+            </if>
+            <if test="billType != null">
+                bill_type = #{billType,jdbcType=TINYINT},
+            </if>
+            <if test="billMonth != null">
+                bill_month = #{billMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="billAmount != null">
+                bill_amount = #{billAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="payableAmount != null">
+                payable_amount = #{payableAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                prepaid_amount = #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="prepaidAmount != null">
+                deposit_amount = #{prepaidAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="currentCost != null">
+                current_cost = #{currentCost,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentDeadline != null">
+                payment_deadline = #{paymentDeadline,jdbcType=TIMESTAMP},
+            </if>
+            <if test="transactionStatus != null">
+                transaction_status = #{transactionStatus,jdbcType=INTEGER},
+            </if>
+            <if test="billStartTime != null">
+                bill_start_time = #{billStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="billEndTime != null">
+                bill_end_time = #{billEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="totalDays != null">
+                total_days = #{totalDays,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="obatchUpdateByTradingOrderNoSelective">
+        update bill
+        <set>
+            <if test="transactionStatus != null">
+                transaction_status = #{transactionStatus,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+                payable_amount = bill_amount
+            </if>
+        </set>
+        where trading_order_no in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+
+</mapper>

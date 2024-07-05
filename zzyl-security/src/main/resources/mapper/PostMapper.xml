@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.PostMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Post">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="dept_no" jdbcType="VARCHAR" property="deptNo"/>
+        <result column="post_no" jdbcType="VARCHAR" property="postNo"/>
+        <result column="post_name" jdbcType="VARCHAR" property="postName"/>
+        <result column="sort_no" jdbcType="INTEGER" property="sortNo"/>
+        <result column="data_state" jdbcType="CHAR" property="dataState"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , dept_no, post_no, post_name, sort_no, data_state, create_time, update_time, remark,
+    create_by, update_by
+    </sql>
+    <select id="selectByPostNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_post
+        where post_no = #{postNo,jdbcType=BIGINT}
+    </select>
+    <insert id="insert" parameterType="com.zzyl.entity.Post">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_post (dept_no, post_no, post_name,
+        sort_no, data_state, create_time,
+        update_time, remark, create_by,
+        update_by)
+        values (#{deptNo,jdbcType=VARCHAR}, #{postNo,jdbcType=VARCHAR}, #{postName,jdbcType=VARCHAR},
+        #{sortNo,jdbcType=INTEGER}, #{dataState,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=BIGINT},
+        #{updateBy,jdbcType=BIGINT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.Post">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into sys_post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptNo != null">
+                dept_no,
+            </if>
+            <if test="postNo != null">
+                post_no,
+            </if>
+            <if test="postName != null">
+                post_name,
+            </if>
+            <if test="sortNo != null">
+                sort_no,
+            </if>
+            <if test="dataState != null">
+                data_state,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptNo != null">
+                #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postNo != null">
+                #{postNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postName != null">
+                #{postName,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectPage" parameterType="com.zzyl.dto.PostDto" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_post
+        <where>
+            <if test="postDto.postNo!=null and postDto.postNo!=''">
+                and post_no=#{postDto.postNo}
+            </if>
+            <if test="postDto.postName!=null and postDto.postName!=''">
+                and post_name like concat('%',#{postDto.postName},'%')
+            </if>
+            <if test="postDto.deptNo!=null and postDto.deptNo!=''">
+                and dept_no = #{postDto.deptNo}
+            </if>
+            <if test="postDto.dataState!=null and postDto.dataState!=''">
+                and data_state=#{postDto.dataState}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="selectList" parameterType="com.zzyl.dto.PostDto" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_post
+        <where>
+            <if test="postDto.postNo!=null and postDto.postNo!=''">
+                and post_no=#{postDto.postNo}
+            </if>
+            <if test="postDto.postName!=null and postDto.postName!=''">
+                and post_name like concat('%',#{postDto.postName},'%')
+            </if>
+            <if test="postDto.deptNo!=null and postDto.deptNo!=''">
+                and dept_no = #{postDto.deptNo}
+            </if>
+            <if test="postDto.dataState!=null and postDto.dataState!=''">
+                and data_state=#{postDto.dataState}
+            </if>
+            <if test="postDto.params.dataScope != null">
+                and ${postDto.params.dataScope}
+            </if>
+        </where>
+        order by sort_no asc, create_time desc
+    </select>
+    <select id="findPostVoListByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT p.id,
+               p.dept_no,
+               p.post_no,
+               p.post_name,
+               p.sort_no,
+               p.data_state,
+               p.create_by,
+               p.create_time,
+               p.update_by,
+               p.update_time,
+               p.remark
+        FROM sys_user dpu
+                 LEFT JOIN sys_post p ON dpu.post_no = p.post_no
+        WHERE p.data_state = '0'
+          AND dpu.user_id = #{userId}
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.Post">
+        update sys_post
+        <set>
+            <if test="deptNo != null">
+                dept_no = #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postNo != null">
+                post_no = #{postNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postName != null">
+                post_name = #{postName,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Post">
+        update sys_post
+        <set>
+            <if test="deptNo != null">
+                dept_no = #{deptNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postNo != null">
+                post_no = #{postNo,jdbcType=VARCHAR},
+            </if>
+            <if test="postName != null">
+                post_name = #{postName,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo,jdbcType=INTEGER},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=CHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deletePostByIds" parameterType="java.lang.String">
+        delete from sys_post where post_no in
+        <foreach collection="postIds" item="postId" open="(" separator="," close=")">
+            #{postId}
+        </foreach>
+    </delete>
+    <delete id="deletePostByDeptNo">
+        delete
+        from sys_post
+        where dept_no = #{deptId}
+    </delete>
+
+    <select id="checkPostHasUser" resultType="Integer">
+        SELECT
+        COUNT(DISTINCT(u.`user_id`)) AS userTotal
+        FROM
+        `sys_user` u
+        where u.`post_no` in
+        <foreach collection="postIds" item="index" open="(" separator="," close=")">
+            #{index}
+        </foreach>
+    </select>
+</mapper>

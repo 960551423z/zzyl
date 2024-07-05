@@ -1,0 +1,38 @@
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": {
+    "total": "9",
+    "pageSize": 10,
+    "pages": "1",
+    "page": 1,
+    "records": [
+      {
+        "id": "182",
+        "createTime": "2023-10-20 23:15:20",
+        "remark": "HT202310202317241",
+        "checkInCode": "RZ202310202315191",
+        "title": "仁和的入住申请",
+        "elderDto": {
+          "id": "182",
+          "name": "仁和",
+          "status": 2,
+          "idCardNo": "132123196612091234"
+        },
+        "elderId": "143",
+        "counselor": "养老顾问",
+        "checkInTime": "2023-10-20 00:00:00",
+        "applicat": "养老顾问",
+        "deptNo": "100001006000000",
+        "applicatId": "1671403256519078161",
+        "flowStatus": 4,
+        "status": 2,
+        "bedVo": {
+          "id": "182",
+          "bedNumber": "104-2",
+          "status": 0
+        }
+      }
+    ]
+  }
+}

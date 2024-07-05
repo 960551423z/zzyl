@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.ElderMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Elder">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="id_card_no" jdbcType="VARCHAR" property="idCardNo"/>
+        <result column="phone" property="phone"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="bed_number" jdbcType="VARCHAR" property="bedNumber"/>
+        <result column="bed_id" jdbcType="BIGINT" property="bedId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , name, image, id_card_no, phone, status, create_time, update_time, create_by, update_by, remark,bed_number,bed_id
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from elder
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from elder
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.Elder" useGeneratedKeys="true" keyProperty="id">
+        insert into elder (id, name, image, id_card_no, sex, age,
+                           status, create_time, update_time,
+                           create_by, update_by, phone, remark)
+        values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR},
+                #{idCardNo,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{age,jdbcType=VARCHAR},
+                #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+                #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT}, #{phone,jdbcType=BIGINT},
+                #{remark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.Elder">
+        insert into elder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="image != null">
+                image,
+            </if>
+            <if test="idCardNo != null">
+                id_card_no,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="bedNumber != null">
+                bed_number,
+            </if>
+            <if test="bedId != null">
+                bed_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="image != null">
+                #{image,jdbcType=VARCHAR},
+            </if>
+            <if test="idCardNo != null">
+                #{idCardNo,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="bedNumber != null">
+                #{bedNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="bedId != null">
+                #{bedId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.Elder">
+        update elder
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="image != null">
+                image = #{image,jdbcType=VARCHAR},
+            </if>
+            <if test="idCardNo != null">
+                id_card_no = #{idCardNo,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="bedNumber != null">
+                bed_number = #{bedNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="bedId != null">
+                bed_id = #{bedId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Elder">
+        update elder
+        set name        = #{name,jdbcType=VARCHAR},
+            image       = #{image,jdbcType=VARCHAR},
+            status      = #{status,jdbcType=INTEGER},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            create_by   = #{createBy,jdbcType=BIGINT},
+            update_by   = #{updateBy,jdbcType=BIGINT},
+            remark      = #{remark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="selectByIdCardAndName" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from elder
+        where id_card_no = #{idCard,jdbcType=VARCHAR} and name = #{name,jdbcType=VARCHAR}
+        and status != 0
+    </select>
+
+    <select id="selectList" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from elder
+        where status != 0 and 5 > status
+        order by create_time desc
+    </select>
+
+    <select id="selectByIds" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from elder
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectListByPage" resultType="com.zzyl.vo.ChoiceElderVo">
+
+        SELECT * FROM (
+
+        SELECT
+        ed.id elderId,
+        ed.NAME,
+        ed.id_card_no idCardNo,
+        ed.phone,
+        cic.cost_start_time checkInStartTime,
+        cic.cost_end_time checkInEndTime,
+        nl.NAME nursingLevelName,
+        cic.bed_no bedNo,
+        ct.NAME AS contractName,
+        ct.pdf_url contractUrl,
+        ct.contract_no contractNo,
+        tu.real_name counselor,
+        tn.real_name nursingName
+        FROM
+        elder ed
+        left join contract ct on ed.id = ct.elder_id
+        left join check_in_config cic on ed.id = cic.elder_id
+        left join nursing_level nl on nl.id = cic.nursing_level_id
+        left join sys_user tu on tu.id = ed.create_by
+        left join nursing_elder ne on ne.elder_id = ed.id
+        left join sys_user tn on tn.id = ne.nursing_id
+        where ed.status = 1
+        <if test="name != null and name != ''">
+            and ed.name like concat('%', #{name}, '%')
+        </if>
+        <if test="idCardNo != null and idCardNo != ''">
+            and ed.id_card_no = #{idCardNo}
+        </if>
+        group by ed.id
+        order by ed.create_time desc
+        ) n
+
+    </select>
+
+    <select id="selectByIdCard" resultType="com.zzyl.entity.Elder">
+        select
+        <include refid="Base_Column_List"/>
+        from elder
+        where id_card_no = #{idCard,jdbcType=VARCHAR}
+        and status != 0
+    </select>
+
+</mapper>

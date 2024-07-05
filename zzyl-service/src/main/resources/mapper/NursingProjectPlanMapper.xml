@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.NursingProjectPlanMapper">
+    <resultMap id="NursingProjectPlan" type="com.zzyl.entity.NursingProjectPlan">
+        <id property="id" column="id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="executeTime" column="execute_time"/>
+        <result property="executeCycle" column="execute_cycle"/>
+        <result property="executeFrequency" column="execute_frequency"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zzyl.entity.NursingProjectPlan">
+        INSERT INTO nursing_project_plan (plan_id, project_id, execute_time, execute_cycle, execute_frequency,
+                                          create_by, update_by, remark, create_time, update_time)
+        VALUES (#{planId}, #{projectId}, #{executeTime}, #{executeCycle}, #{executeFrequency}, #{createBy}, #{updateBy},
+                #{remark}, #{createTime}, #{updateTime})
+    </insert>
+
+    <insert id="insertList" parameterType="java.util.List">
+        INSERT INTO nursing_project_plan (plan_id, project_id, execute_time, execute_cycle, execute_frequency,
+        create_by, update_by, remark, create_time, update_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.planId}, #{item.projectId}, #{item.executeTime}, #{item.executeCycle}, #{item.executeFrequency},
+            #{item.createBy}, #{item.updateBy}, #{item.remark}, #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.zzyl.entity.NursingProjectPlan">
+        UPDATE nursing_project_plan
+        SET plan_id           = #{planId},
+            project_id        = #{projectId},
+            execute_time      = #{executeTime},
+            execute_cycle     = #{executeCycle},
+            execute_frequency = #{executeFrequency},
+            update_time       = #{updateTime},
+            update_by         = #{updateBy}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByIds" parameterType="java.lang.Long">
+        DELETE FROM nursing_project_plan WHERE id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="NursingProjectPlan">
+        SELECT id, plan_id, project_id, execute_time, execute_cycle, execute_frequency
+        FROM nursing_project_plan
+        WHERE id = #{id}
+    </select>
+
+    <select id="listAllByPlanId" parameterType="java.lang.Long" resultMap="NursingProjectPlan">
+        SELECT id, plan_id, project_id, execute_time, execute_cycle, execute_frequency
+        FROM nursing_project_plan
+        WHERE plan_id = #{planId}
+    </select>
+
+    <select id="listAllByProjectIds" parameterType="java.lang.Long" resultMap="NursingProjectPlan">
+        SELECT id, plan_id, project_id, execute_time, execute_cycle, execute_frequency FROM nursing_project_plan WHERE
+        project_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>
+

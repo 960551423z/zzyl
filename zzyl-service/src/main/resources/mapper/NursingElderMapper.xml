@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.NursingElderMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.NursingElder">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="nursing_id" jdbcType="BIGINT" property="nursingId"/>
+        <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , nursing_id, elder_id, create_time, update_time, create_by, update_by, remark
+    </sql>
+    <select id="selectByElderId" resultType="com.zzyl.entity.NursingElder">
+        select
+        <include refid="Base_Column_List"/>
+        from nursing_elder
+        where elder_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from nursing_elder
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from nursing_elder
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByElderId">
+        delete
+        from nursing_elder
+        where elder_id = #{elderId,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByElderIds">
+        delete from nursing_elder where elder_id in (
+        <foreach collection='elderIds' separator=',' item='elderId'>
+            #{elderId}
+        </foreach>)
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.NursingElder">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into nursing_elder (nursing_id, elder_id, create_time,
+        update_time, create_by, update_by,
+        remark)
+        values (#{nursingId,jdbcType=BIGINT}, #{elderId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.NursingElder">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into nursing_elder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="nursingId != null">
+                nursing_id,
+            </if>
+            <if test="elderId != null">
+                elder_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="nursingId != null">
+                #{nursingId,jdbcType=BIGINT},
+            </if>
+            <if test="elderId != null">
+                #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.NursingElder">
+        update nursing_elder
+        <set>
+            <if test="nursingId != null">
+                nursing_id = #{nursingId,jdbcType=BIGINT},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.NursingElder">
+        update nursing_elder
+        set nursing_id  = #{nursingId,jdbcType=BIGINT},
+            elder_id    = #{elderId,jdbcType=BIGINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            create_by   = #{createBy,jdbcType=BIGINT},
+            update_by   = #{updateBy,jdbcType=BIGINT},
+            remark      = #{remark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into nursing_elder (nursing_id, elder_id, create_time, update_time, create_by, update_by, remark)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.nursingId,jdbcType=BIGINT}, #{item.elderId,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
+            #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+</mapper>

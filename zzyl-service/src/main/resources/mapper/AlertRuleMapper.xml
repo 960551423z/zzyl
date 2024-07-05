@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.AlertRuleMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.AlertRule">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="module_id" jdbcType="VARCHAR" property="moduleId"/>
+        <result column="module_name" jdbcType="VARCHAR" property="moduleName"/>
+        <result column="function_name" jdbcType="VARCHAR" property="functionName"/>
+        <result column="function_id" jdbcType="VARCHAR" property="functionId"/>
+        <result column="related_device" jdbcType="VARCHAR" property="relatedDevice"/>
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="alert_rule_name" jdbcType="VARCHAR" property="alertRuleName"/>
+        <result column="statistic_field" jdbcType="VARCHAR" property="statisticField"/>
+        <result column="operator" jdbcType="VARCHAR" property="operator"/>
+        <result column="value" jdbcType="REAL" property="value"/>
+        <result column="duration" jdbcType="INTEGER" property="duration"/>
+        <result column="data_aggregation_period" jdbcType="INTEGER" property="dataAggregationPeriod"/>
+        <result column="alert_effective_period" jdbcType="VARCHAR" property="alertEffectivePeriod"/>
+        <result column="alert_silent_period" jdbcType="INTEGER" property="alertSilentPeriod"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , product_id, product_name, module_id, module_name, function_name, function_id,
+    related_device, alert_rule_name, statistic_field, operator, value, duration, data_aggregation_period, 
+    alert_effective_period, alert_silent_period, status, create_time, update_time, create_by, 
+    update_by, remark
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from alert_rule
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from alert_rule
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.zzyl.entity.AlertRule">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into alert_rule (product_id, product_name, module_id,
+        module_name, function_name, function_id,
+        related_device, device_name, alert_rule_name, statistic_field,
+        operator, value, duration,
+        data_aggregation_period, alert_effective_period,
+        alert_silent_period, status, create_time,
+        update_time, create_by, update_by,
+        remark)
+        values (#{productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{moduleId,jdbcType=VARCHAR},
+        #{moduleName,jdbcType=VARCHAR}, #{functionName,jdbcType=VARCHAR}, #{functionId,jdbcType=VARCHAR},
+        #{relatedDevice,jdbcType=VARCHAR},#{deviceName,jdbcType=VARCHAR}, #{alertRuleName,jdbcType=VARCHAR},
+        #{statisticField,jdbcType=VARCHAR},
+        #{operator,jdbcType=VARCHAR}, #{value,jdbcType=REAL}, #{duration,jdbcType=INTEGER},
+        #{dataAggregationPeriod,jdbcType=INTEGER}, #{alertEffectivePeriod,jdbcType=VARCHAR},
+        #{alertSilentPeriod,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="page" resultType="com.zzyl.vo.AlertRuleVo">
+        select
+        a.*
+        , tu.real_name as creator
+        from alert_rule a
+        left join sys_user tu on tu.id = a.create_by
+        <where>
+            <if test="productId != null">
+                and a.product_id = #{productId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="functionName != null">
+                and a.function_name = #{functionName,jdbcType=VARCHAR}
+            </if>
+
+            <if test="alertRuleName != null">
+                and a.alert_rule_name = #{alertRuleName,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="selectByFunctionId" resultType="com.zzyl.entity.AlertRule">
+        select
+        <include refid="Base_Column_List"/>
+        from alert_rule
+        where function_id = #{functionId,jdbcType=VARCHAR}
+        and related_device = #{deviceId,jdbcType=VARCHAR}
+        and product_id = #{productKey,jdbcType=VARCHAR}
+        and status = 1
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.AlertRule">
+        update alert_rule
+        <set>
+            <if test="productId != null">
+                product_id = #{productId,jdbcType=VARCHAR},
+            </if>
+            <if test="productName != null">
+                product_name = #{productName,jdbcType=VARCHAR},
+            </if>
+            <if test="moduleId != null">
+                module_id = #{moduleId,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceName != null">
+                device_name = #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="moduleName != null">
+                module_name = #{moduleName,jdbcType=VARCHAR},
+            </if>
+            <if test="functionName != null">
+                function_name = #{functionName,jdbcType=VARCHAR},
+            </if>
+            <if test="functionId != null">
+                function_id = #{functionId,jdbcType=VARCHAR},
+            </if>
+            <if test="relatedDevice != null">
+                related_device = #{relatedDevice,jdbcType=VARCHAR},
+            </if>
+            <if test="alertRuleName != null">
+                alert_rule_name = #{alertRuleName,jdbcType=VARCHAR},
+            </if>
+            <if test="statisticField != null">
+                statistic_field = #{statisticField,jdbcType=VARCHAR},
+            </if>
+            <if test="operator != null">
+                operator = #{operator,jdbcType=VARCHAR},
+            </if>
+            <if test="value != null">
+                value = #{value,jdbcType=REAL},
+            </if>
+            <if test="duration != null">
+                duration = #{duration,jdbcType=INTEGER},
+            </if>
+            <if test="dataAggregationPeriod != null">
+                data_aggregation_period = #{dataAggregationPeriod,jdbcType=INTEGER},
+            </if>
+            <if test="alertEffectivePeriod != null">
+                alert_effective_period = #{alertEffectivePeriod,jdbcType=VARCHAR},
+            </if>
+            <if test="alertSilentPeriod != null">
+                alert_silent_period = #{alertSilentPeriod,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateStatus">
+        UPDATE alert_rule
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+</mapper>

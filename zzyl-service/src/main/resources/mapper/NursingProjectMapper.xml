@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzyl.mapper.NursingProjectMapper">
+
+    <resultMap id="nursingProjectResultMap" type="com.zzyl.vo.NursingProjectVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="unit" property="unit"/>
+        <result column="price" property="price"/>
+        <result column="image" property="image"/>
+        <result column="nursing_requirement" property="nursingRequirement"/>
+        <result column="status" property="status"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="creator" property="creator"/>
+    </resultMap>
+
+
+
+    <select id="getByPage" resultMap="nursingProjectResultMap">
+        select np.*, su.real_name as creator
+        from nursing_project as np
+                 left join sys_user as su on su.id = np.create_by
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name} ,'%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="insert" parameterType="com.zzyl.entity.NursingProject">
+        insert into nursing_project (name, order_no, unit, price, image, nursing_requirement, status, create_by,
+                                     update_by, remark, create_time, update_time)
+        values (#{name}, #{orderNo}, #{unit}, #{price}, #{image}, #{nursingRequirement}, #{status}, #{createBy},
+                #{updateBy}, #{remark}, #{createTime}, #{updateTime})
+    </insert>
+
+
+    <select id="selectById" resultType="com.zzyl.vo.NursingProjectVo" parameterType="java.lang.Long">
+        select *
+        from nursing_project
+        where id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.zzyl.entity.NursingProject">
+        update nursing_project
+        set name                = #{name},
+            order_no            = #{orderNo},
+            unit                = #{unit},
+            price               = #{price},
+            image               = #{image},
+            nursing_requirement = #{nursingRequirement},
+            status              = #{status},
+            update_by           = #{updateBy},
+            update_time         = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update nursing_project
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from nursing_project
+        where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zzyl.mapper.MemberMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Member">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="name" property="name"/>
+        <result column="avatar" property="avatar"/>
+        <result column="open_id" property="openId"/>
+        <result column="gender" property="gender"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , phone, name, avatar, open_id, gender, create_by, update_by,create_time
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM member WHERE id = #{id}
+    </select>
+
+    <select id="getByOpenid" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM member WHERE open_id = #{openId}
+    </select>
+
+    <insert id="save" parameterType="com.zzyl.entity.Member" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO member (phone, name, avatar, open_id, gender, create_by, create_time)
+        VALUES (#{phone}, #{name}, #{avatar}, #{openId}, #{gender}, #{createBy}, #{createTime})
+    </insert>
+
+    <update id="update" parameterType="com.zzyl.entity.Member">
+        UPDATE member
+        SET phone       = #{phone},
+            name        = #{name},
+            avatar      = #{avatar},
+            open_id     = #{openId},
+            gender      = #{gender},
+            update_by   = #{updateBy},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE
+        FROM member
+        WHERE id = #{id}
+    </delete>
+
+
+    <select id="page" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM member
+        <where>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="name != null and name != ''">
+                AND name like concat('%',#{name},'%')
+            </if>
+        </where>
+        ORDER BY create_time desc
+    </select>
+
+
+</mapper>
+
+

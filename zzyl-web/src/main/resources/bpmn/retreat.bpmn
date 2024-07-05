@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:activiti="http://activiti.org/bpmn" id="sample-diagram" targetNamespace="http://activiti.org/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="retreat" name="retreat" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>Flow_0tmf0t9</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:userTask id="Activity_0wnxfh7" name="退住申请" activiti:formKey="0" activiti:assignee="${assignee0}">
+      <bpmn2:incoming>Flow_0tmf0t9</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0i1uar7</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_0otvzbt" name="退住申请审批-处理" activiti:formKey="1" activiti:assignee="${assignee1}">
+      <bpmn2:incoming>Flow_0i1uar7</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_13nhpj0</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_0pemrl3" name="解除合同-处理" activiti:formKey="2" activiti:assignee="${assignee2}">
+      <bpmn2:incoming>Flow_13nhpj0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1dsxdol</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_0qo0ntj" name="调整账单-处理" activiti:formKey="3" activiti:assignee="${assignee3}">
+      <bpmn2:incoming>Flow_1dsxdol</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1vx7d6d</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_1g2ml67" name="账单审批-处理" activiti:formKey="4" activiti:assignee="${assignee4}">
+      <bpmn2:incoming>Flow_1vx7d6d</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0gfwyld</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_0exhpro" name="退住审批-处理" activiti:formKey="5" activiti:assignee="${assignee5}">
+      <bpmn2:incoming>Flow_0gfwyld</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0e9ttga</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_048fr1j" name="费用清算-处理" activiti:formKey="6" activiti:assignee="${assignee6}">
+      <bpmn2:incoming>Flow_0e9ttga</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_03ny3ep</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="Flow_0i1uar7" sourceRef="Activity_0wnxfh7" targetRef="Activity_0otvzbt" />
+    <bpmn2:sequenceFlow id="Flow_13nhpj0" sourceRef="Activity_0otvzbt" targetRef="Activity_0pemrl3" />
+    <bpmn2:sequenceFlow id="Flow_1dsxdol" sourceRef="Activity_0pemrl3" targetRef="Activity_0qo0ntj" />
+    <bpmn2:sequenceFlow id="Flow_1vx7d6d" sourceRef="Activity_0qo0ntj" targetRef="Activity_1g2ml67" />
+    <bpmn2:sequenceFlow id="Flow_0gfwyld" sourceRef="Activity_1g2ml67" targetRef="Activity_0exhpro" />
+    <bpmn2:sequenceFlow id="Flow_0e9ttga" sourceRef="Activity_0exhpro" targetRef="Activity_048fr1j" />
+    <bpmn2:sequenceFlow id="Flow_0tmf0t9" sourceRef="StartEvent_1" targetRef="Activity_0wnxfh7" />
+    <bpmn2:endEvent id="Event_0gfqjwo">
+      <bpmn2:incoming>Flow_03ny3ep</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="Flow_03ny3ep" sourceRef="Activity_048fr1j" targetRef="Event_0gfqjwo" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="retreat">
+      <bpmndi:BPMNEdge id="Flow_0i1uar7_di" bpmnElement="Flow_0i1uar7">
+        <di:waypoint x="510" y="240" />
+        <di:waypoint x="550" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13nhpj0_di" bpmnElement="Flow_13nhpj0">
+        <di:waypoint x="650" y="240" />
+        <di:waypoint x="700" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dsxdol_di" bpmnElement="Flow_1dsxdol">
+        <di:waypoint x="800" y="240" />
+        <di:waypoint x="850" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vx7d6d_di" bpmnElement="Flow_1vx7d6d">
+        <di:waypoint x="900" y="280" />
+        <di:waypoint x="900" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gfwyld_di" bpmnElement="Flow_0gfwyld">
+        <di:waypoint x="850" y="410" />
+        <di:waypoint x="800" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e9ttga_di" bpmnElement="Flow_0e9ttga">
+        <di:waypoint x="700" y="410" />
+        <di:waypoint x="650" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tmf0t9_di" bpmnElement="Flow_0tmf0t9">
+        <di:waypoint x="378" y="240" />
+        <di:waypoint x="410" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03ny3ep_di" bpmnElement="Flow_03ny3ep">
+        <di:waypoint x="550" y="410" />
+        <di:waypoint x="458" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="342" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wnxfh7_di" bpmnElement="Activity_0wnxfh7">
+        <dc:Bounds x="410" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0otvzbt_di" bpmnElement="Activity_0otvzbt">
+        <dc:Bounds x="550" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pemrl3_di" bpmnElement="Activity_0pemrl3">
+        <dc:Bounds x="700" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qo0ntj_di" bpmnElement="Activity_0qo0ntj">
+        <dc:Bounds x="850" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1g2ml67_di" bpmnElement="Activity_1g2ml67">
+        <dc:Bounds x="850" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0exhpro_di" bpmnElement="Activity_0exhpro">
+        <dc:Bounds x="700" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_048fr1j_di" bpmnElement="Activity_048fr1j">
+        <dc:Bounds x="550" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0gfqjwo_di" bpmnElement="Event_0gfqjwo">
+        <dc:Bounds x="422" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

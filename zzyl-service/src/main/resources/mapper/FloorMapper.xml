@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzyl.mapper.FloorMapper">
+
+    <resultMap id="floorResultMap" type="com.zzyl.entity.Floor">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="floorResultMapWithRoomAndBed" type="com.zzyl.vo.FloorVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <collection property="roomVoList" ofType="com.zzyl.vo.RoomVo">
+            <id property="id" column="rid"/>
+            <result property="code" column="code"/>
+            <result property="sort" column="sort"/>
+            <result property="sort" column="sort"/>
+            <result property="floorId" column="floor_id"/>
+            <result column="create_by" property="createBy"/>
+            <result column="update_by" property="updateBy"/>
+            <result column="remark" property="remark"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+            <result column="price" property="price"/>
+            <collection property="bedVoList" ofType="com.zzyl.vo.BedVo">
+                <id column="bid" property="id"/>
+                <result column="bed_number" property="bedNumber"/>
+                <result column="bed_status" property="bedStatus"/>
+                <result column="room_id" property="roomId"/>
+                <result column="lname" property="lname"/>
+                <result column="ename" property="name"/>
+                <result column="eid" property="elderId"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zzyl.entity.Floor">
+        insert into floor(name, code, create_by, update_by, remark, create_time, update_time)
+        values (#{name}, #{code}, #{createBy}, #{updateBy}, #{remark}, #{createTime}, #{updateTime})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from floor
+        where id = #{id}
+    </delete>
+
+    <update id="updateById" parameterType="com.zzyl.entity.Floor">
+        update floor
+        set name        = #{name},
+            code        = #{code},
+            update_by   = #{updateBy},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="floorResultMap" parameterType="java.lang.Long">
+        select *
+        from floor
+        where id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.zzyl.vo.FloorVo">
+        select f.*
+        from floor f
+                 left join room r on r.floor_id = f.id
+                 left join bed b on b.room_id = r.id
+        group by f.id
+        order by code, create_time desc
+
+    </select>
+
+    <select id="selectAllByNur" resultType="com.zzyl.vo.FloorVo">
+        select f.*
+        from floor f
+                 left join room r on r.floor_id = f.id
+                 left join bed b on b.room_id = r.id
+                 left join elder e on e.bed_id = b.id
+        where b.bed_status = 1
+        group by f.id
+        order by code, create_time desc
+
+    </select>
+
+    <select id="selectAllByDevice" resultType="com.zzyl.vo.FloorVo">
+        select f.*
+        from floor f
+                 left join room r on r.floor_id = f.id
+                 left join bed b on b.room_id = r.id
+                 left join device d
+                           on d.binding_location = r.id and d.location_type = 1 and d.physical_location_type = 1
+                 left join device dd
+                           on dd.binding_location = b.id and dd.location_type = 1 and dd.physical_location_type = 2
+        where (d.id is not null or dd.id is not null)
+        group by f.id
+        order by code, create_time desc
+
+    </select>
+    <select id="selectAllRoomAndBed" resultMap="floorResultMapWithRoomAndBed">
+        select f.name,
+               f.id,
+               r.id as rid,
+               r.code,
+               r.sort,
+               r.type_name,
+               r.floor_id,
+               b.id as bid,
+               b.bed_number,
+               b.sort,
+               b.bed_status,
+               b.room_id,
+               b.create_by,
+               b.update_by,
+               b.remark,
+               b.create_time,
+               b.update_time
+        from floor f
+                 left join room r on r.floor_id = f.id
+                 left join bed b on b.room_id = r.id
+    </select>
+
+</mapper>

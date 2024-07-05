@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.BalanceMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Balance">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="prepaid_balance" jdbcType="DECIMAL" property="prepaidBalance"/>
+        <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+        <result column="arrears_amount" jdbcType="DECIMAL" property="arrearsAmount"/>
+        <result column="payment_deadline" jdbcType="TIMESTAMP" property="paymentDeadline"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+        <result column="elder_name" jdbcType="VARCHAR" property="elderName"/>
+        <result column="bed_no" jdbcType="VARCHAR" property="bedNo"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , prepaid_balance, deposit_amount, arrears_amount, payment_deadline, status, elder_id,
+    elder_name, bed_no, create_time, update_time, create_by, update_by, remark
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from balance
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="page" resultType="com.zzyl.entity.Balance">
+        select
+        b.id, b.prepaid_balance, b.deposit_amount, b.arrears_amount, b.payment_deadline, b.status, b.elder_id,
+        b.create_time, b.update_time, b.create_by, b.update_by, b.remark
+        , e.name as elder_name
+        , bed.bed_number as bed_no
+        from balance b
+        left join elder e on b.elder_id = e.id
+        left join bed bed on bed.id = e.bed_id
+        <where>
+            <if test="bedNo != null ">
+                AND bed.bed_number = #{bedNo}
+            </if>
+            <if test="elderName != null ">
+                AND e.name = #{elderName}
+            </if>
+        </where>
+        order by b.create_time desc
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from balance
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.Balance">
+        insert into balance (id, prepaid_balance, deposit_amount,
+                             arrears_amount, payment_deadline, status,
+                             elder_id, elder_name, bed_no,
+                             create_time, update_time, create_by,
+                             update_by, remark)
+        values (#{id,jdbcType=BIGINT}, #{prepaidBalance,jdbcType=DECIMAL}, #{depositAmount,jdbcType=DECIMAL},
+                #{arrearsAmount,jdbcType=DECIMAL}, #{paymentDeadline,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER},
+                #{elderId,jdbcType=BIGINT}, #{elderName,jdbcType=VARCHAR}, #{bedNo,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT},
+                #{updateBy,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.Balance">
+        insert into balance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="prepaidBalance != null">
+                prepaid_balance,
+            </if>
+            <if test="depositAmount != null">
+                deposit_amount,
+            </if>
+            <if test="arrearsAmount != null">
+                arrears_amount,
+            </if>
+            <if test="paymentDeadline != null">
+                payment_deadline,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="elderId != null">
+                elder_id,
+            </if>
+            <if test="elderName != null">
+                elder_name,
+            </if>
+            <if test="bedNo != null">
+                bed_no,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="prepaidBalance != null">
+                #{prepaidBalance,jdbcType=DECIMAL},
+            </if>
+            <if test="depositAmount != null">
+                #{depositAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="arrearsAmount != null">
+                #{arrearsAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentDeadline != null">
+                #{paymentDeadline,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="elderId != null">
+                #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="elderName != null">
+                #{elderName,jdbcType=VARCHAR},
+            </if>
+            <if test="bedNo != null">
+                #{bedNo,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.Balance">
+        update balance
+        <set>
+            <if test="prepaidBalance != null">
+                prepaid_balance = #{prepaidBalance,jdbcType=DECIMAL},
+            </if>
+            <if test="depositAmount != null">
+                deposit_amount = #{depositAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="arrearsAmount != null">
+                arrears_amount = #{arrearsAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentDeadline != null">
+                payment_deadline = #{paymentDeadline,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="elderId != null">
+                elder_id = #{elderId,jdbcType=BIGINT},
+            </if>
+            <if test="elderName != null">
+                elder_name = #{elderName,jdbcType=VARCHAR},
+            </if>
+            <if test="bedNo != null">
+                bed_no = #{bedNo,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Balance">
+        update balance
+        set prepaid_balance  = #{prepaidBalance,jdbcType=DECIMAL},
+            deposit_amount   = #{depositAmount,jdbcType=DECIMAL},
+            arrears_amount   = #{arrearsAmount,jdbcType=DECIMAL},
+            payment_deadline = #{paymentDeadline,jdbcType=TIMESTAMP},
+            status           = #{status,jdbcType=INTEGER},
+            elder_id         = #{elderId,jdbcType=BIGINT},
+            elder_name       = #{elderName,jdbcType=VARCHAR},
+            bed_no           = #{bedNo,jdbcType=VARCHAR},
+            create_time      = #{createTime,jdbcType=TIMESTAMP},
+            update_time      = #{updateTime,jdbcType=TIMESTAMP},
+            create_by        = #{createBy,jdbcType=BIGINT},
+            update_by        = #{updateBy,jdbcType=BIGINT},
+            remark           = #{remark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

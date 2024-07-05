@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.RefundRecordMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.RefundRecord">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="trading_order_no" jdbcType="BIGINT" property="tradingOrderNo"/>
+        <result column="product_order_no" jdbcType="BIGINT" property="productOrderNo"/>
+        <result column="refund_no" jdbcType="BIGINT" property="refundNo"/>
+        <result column="enterprise_id" jdbcType="BIGINT" property="enterpriseId"/>
+        <result column="trading_channel" jdbcType="VARCHAR" property="tradingChannel"/>
+        <result column="refund_status" jdbcType="INTEGER" property="refundStatus"/>
+        <result column="refund_code" jdbcType="VARCHAR" property="refundCode"/>
+        <result column="memo" jdbcType="VARCHAR" property="memo"/>
+        <result column="refund_amount" jdbcType="DECIMAL" property="refundAmount"/>
+        <result column="total" jdbcType="DECIMAL" property="total"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="rcreator" jdbcType="VARCHAR" property="creator"/>
+    </resultMap>
+
+    <resultMap id="RefundRecordVoMap" type="com.zzyl.vo.RefundRecordVo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="trading_order_no" jdbcType="BIGINT" property="tradingOrderNo"/>
+        <result column="product_order_no" jdbcType="BIGINT" property="productOrderNo"/>
+        <result column="refund_no" jdbcType="BIGINT" property="refundNo"/>
+        <result column="enterprise_id" jdbcType="BIGINT" property="enterpriseId"/>
+        <result column="trading_channel" jdbcType="VARCHAR" property="tradingChannel"/>
+        <result column="refund_status" jdbcType="INTEGER" property="refundStatus"/>
+        <result column="refund_code" jdbcType="VARCHAR" property="refundCode"/>
+        <result column="memo" jdbcType="VARCHAR" property="memo"/>
+        <result column="refund_amount" jdbcType="DECIMAL" property="refundAmount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="admin_creator" jdbcType="VARCHAR" property="adminCreator"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="create_type" property="createType"/>
+    </resultMap>
+
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.zzyl.entity.RefundRecord">
+        <result column="refund_msg" jdbcType="LONGVARCHAR" property="refundMsg"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , trading_order_no, product_order_no, refund_no, enterprise_id, trading_channel,
+    refund_status, refund_code, memo, refund_amount, total, create_time, update_time,
+    create_by, update_by, remark
+    </sql>
+    <sql id="Blob_Column_List">
+        refund_msg
+    </sql>
+    <select id="selectByRefundNo" resultMap="RefundRecordVoMap">
+        SELECT r.*,
+               (SELECT NAME FROM member m WHERE m.id = r.create_by) AS creator,
+               adminu.real_name                                     as admin_creator,
+               o.status                                                order_status,
+               o.order_no                                           as order_no
+        FROM refund_record r
+                 LEFT JOIN sys_user adminu ON r.create_by = adminu.id
+                 left join `order` o on o.id = r.product_order_no
+        WHERE r.refund_no = #{refundNo}
+
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from refund_record
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.RefundRecord">
+        insert into refund_record (id, trading_order_no, product_order_no,
+                                   refund_no, enterprise_id, trading_channel,
+                                   refund_status, refund_code, memo,
+                                   refund_amount, total, create_time,
+                                   update_time, create_by, update_by,
+                                   remark, refund_msg, create_type)
+        values (#{id,jdbcType=BIGINT}, #{tradingOrderNo,jdbcType=BIGINT}, #{productOrderNo,jdbcType=BIGINT},
+                #{refundNo,jdbcType=BIGINT}, #{enterpriseId,jdbcType=BIGINT}, #{tradingChannel,jdbcType=VARCHAR},
+                #{refundStatus,jdbcType=INTEGER}, #{refundCode,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR},
+                #{refundAmount,jdbcType=DECIMAL}, #{total,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+                #{remark,jdbcType=VARCHAR}, #{refundMsg,jdbcType=LONGVARCHAR}, #{createType,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.RefundRecord">
+        insert into refund_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="tradingOrderNo != null">
+                trading_order_no,
+            </if>
+            <if test="productOrderNo != null">
+                product_order_no,
+            </if>
+            <if test="refundNo != null">
+                refund_no,
+            </if>
+            <if test="enterpriseId != null">
+                enterprise_id,
+            </if>
+            <if test="tradingChannel != null">
+                trading_channel,
+            </if>
+            <if test="refundStatus != null">
+                refund_status,
+            </if>
+            <if test="refundCode != null">
+                refund_code,
+            </if>
+            <if test="memo != null">
+                memo,
+            </if>
+            <if test="refundAmount != null">
+                refund_amount,
+            </if>
+            <if test="total != null">
+                total,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="refundMsg != null">
+                refund_msg,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="tradingOrderNo != null">
+                #{tradingOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="productOrderNo != null">
+                #{productOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="refundNo != null">
+                #{refundNo,jdbcType=BIGINT},
+            </if>
+            <if test="enterpriseId != null">
+                #{enterpriseId,jdbcType=BIGINT},
+            </if>
+            <if test="tradingChannel != null">
+                #{tradingChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="refundStatus != null">
+                #{refundStatus,jdbcType=INTEGER},
+            </if>
+            <if test="refundCode != null">
+                #{refundCode,jdbcType=VARCHAR},
+            </if>
+            <if test="memo != null">
+                #{memo,jdbcType=VARCHAR},
+            </if>
+            <if test="refundAmount != null">
+                #{refundAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="total != null">
+                #{total,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="refundMsg != null">
+                #{refundMsg,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into refund_record (id, trading_order_no, product_order_no,
+        refund_no, enterprise_id, trading_channel,
+        refund_status, refund_code, memo,
+        refund_amount, total, create_time,
+        update_time, create_by, update_by,
+        remark, refund_msg, create_type)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=BIGINT}, #{item.tradingOrderNo,jdbcType=BIGINT}, #{item.productOrderNo,jdbcType=BIGINT},
+            #{item.refundNo,jdbcType=BIGINT}, #{item.enterpriseId,jdbcType=BIGINT},
+            #{item.tradingChannel,jdbcType=VARCHAR},
+            #{item.refundStatus,jdbcType=INTEGER}, #{item.refundCode,jdbcType=VARCHAR}, #{item.memo,jdbcType=VARCHAR},
+            #{item.refundAmount,jdbcType=DECIMAL}, #{item.total,jdbcType=DECIMAL},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
+            #{item.remark,jdbcType=VARCHAR}, #{item.refundMsg,jdbcType=LONGVARCHAR},
+            #{item.createType,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.RefundRecord">
+        update refund_record
+        <set>
+            <if test="tradingOrderNo != null">
+                trading_order_no = #{tradingOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="productOrderNo != null">
+                product_order_no = #{productOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="refundNo != null">
+                refund_no = #{refundNo,jdbcType=BIGINT},
+            </if>
+            <if test="enterpriseId != null">
+                enterprise_id = #{enterpriseId,jdbcType=BIGINT},
+            </if>
+            <if test="tradingChannel != null">
+                trading_channel = #{tradingChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="refundStatus != null">
+                refund_status = #{refundStatus,jdbcType=INTEGER},
+            </if>
+            <if test="refundCode != null">
+                refund_code = #{refundCode,jdbcType=VARCHAR},
+            </if>
+            <if test="memo != null">
+                memo = #{memo,jdbcType=VARCHAR},
+            </if>
+            <if test="refundAmount != null">
+                refund_amount = #{refundAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="total != null">
+                total = #{total,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="refundMsg != null">
+                refund_msg = #{refundMsg,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zzyl.entity.RefundRecord">
+        update refund_record
+        set trading_order_no = #{tradingOrderNo,jdbcType=BIGINT},
+            product_order_no = #{productOrderNo,jdbcType=BIGINT},
+            refund_no        = #{refundNo,jdbcType=BIGINT},
+            enterprise_id    = #{enterpriseId,jdbcType=BIGINT},
+            trading_channel  = #{tradingChannel,jdbcType=VARCHAR},
+            refund_status    = #{refundStatus,jdbcType=INTEGER},
+            refund_code      = #{refundCode,jdbcType=VARCHAR},
+            memo             = #{memo,jdbcType=VARCHAR},
+            refund_amount    = #{refundAmount,jdbcType=DECIMAL},
+            total            = #{total,jdbcType=DECIMAL},
+            create_time      = #{createTime,jdbcType=TIMESTAMP},
+            update_time      = #{updateTime,jdbcType=TIMESTAMP},
+            create_by        = #{createBy,jdbcType=BIGINT},
+            update_by        = #{updateBy,jdbcType=BIGINT},
+            remark           = #{remark,jdbcType=VARCHAR},
+            refund_msg       = #{refundMsg,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.RefundRecord">
+        update refund_record
+        set trading_order_no = #{tradingOrderNo,jdbcType=BIGINT},
+            product_order_no = #{productOrderNo,jdbcType=BIGINT},
+            refund_no        = #{refundNo,jdbcType=BIGINT},
+            enterprise_id    = #{enterpriseId,jdbcType=BIGINT},
+            trading_channel  = #{tradingChannel,jdbcType=VARCHAR},
+            refund_status    = #{refundStatus,jdbcType=INTEGER},
+            refund_code      = #{refundCode,jdbcType=VARCHAR},
+            memo             = #{memo,jdbcType=VARCHAR},
+            refund_amount    = #{refundAmount,jdbcType=DECIMAL},
+            total            = #{total,jdbcType=DECIMAL},
+            create_time      = #{createTime,jdbcType=TIMESTAMP},
+            update_time      = #{updateTime,jdbcType=TIMESTAMP},
+            create_by        = #{createBy,jdbcType=BIGINT},
+            update_by        = #{updateBy,jdbcType=BIGINT},
+            remark           = #{remark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectListByTradingOrderNo" resultMap="ResultMapWithBLOBs">
+        SELECT *
+        FROM refund_record
+        WHERE trading_order_no = #{tradingOrderNo}
+          and trading_channel = '小程序支付'
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectListByProductOrderNo" resultMap="ResultMapWithBLOBs">
+        SELECT *
+        FROM refund_record
+        WHERE product_order_no = #{productOrderNo}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectListByRefundStatus" resultMap="ResultMapWithBLOBs">
+        SELECT *
+        FROM refund_record
+        WHERE refund_status = #{refundStatus}
+        ORDER BY create_time ASC LIMIT #{count}
+    </select>
+    <select id="queryRefundRecord" resultMap="RefundRecordVoMap">
+        SELECT
+        r.*,
+        m.name AS creator ,
+        adminu.real_name as admin_creator,
+        o.status order_status,
+        o.order_no as order_no
+        FROM
+        refund_record r
+        LEFT JOIN sys_user adminu ON r.create_by = adminu.id
+        left join member m on m.id = r.create_by
+        left join `order` o on o.id = r.product_order_no
+        WHERE r.refund_status != ''
+        and r.refund_no != ''
+        <if test="orderNo != null">
+            and o.order_no = #{orderNo,jdbcType=VARCHAR}
+        </if>
+        <if test="refundNo != null">
+            and r.refund_no = #{refundNo,jdbcType=BIGINT}
+        </if>
+        <if test="refundStatus != null">
+            and r.refund_status = #{refundStatus,jdbcType=INTEGER}
+        </if>
+        <if test="startTime != null and endTime != null">
+            and r.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="creator != null">
+            and (
+            m.name like concat('%', #{creator}, '%')
+            or adminu.real_name like concat('%', #{creator}, '%')
+            )
+        </if>
+        order by r.create_time desc
+    </select>
+</mapper>

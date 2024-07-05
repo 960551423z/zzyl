@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.NursingPlanMapper">
+    <resultMap id="NursingPlanMap" type="com.zzyl.entity.NursingPlan">
+        <id property="id" column="id"/>
+        <result property="planName" column="plan_name"/>
+        <result property="sortNo" column="sort_no"/>
+        <result column="status" property="status"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="creator" property="creator"/>
+        <result column="lid" property="lid"/>
+        <collection property="projectPlans" ofType="com.zzyl.vo.NursingProjectPlanVo">
+            <!---<id property="id" column="pid"/> 这里的pid和sql里的对应 用于正确映射 -->
+            <id property="id" column="pid"/>
+            <result property="planId" column="plan_id"/>
+            <result property="projectId" column="project_id"/>
+            <result property="executeTime" column="execute_time"/>
+            <result property="executeCycle" column="execute_cycle"/>
+            <result property="executeFrequency" column="execute_frequency"/>
+            <result column="create_by" property="createBy"/>
+            <result column="update_by" property="updateBy"/>
+            <result column="remark" property="remark"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+            <result column="project_name" property="projectName"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zzyl.entity.NursingPlan" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO nursing_plan(status, sort_no, plan_name, create_by, update_by, remark, create_time, update_time)
+        VALUES (#{status}, #{sortNo}, #{planName}, #{createBy}, #{updateBy}, #{remark}, #{createTime}, #{updateTime});
+    </insert>
+
+    <insert id="insertProjectPlanList"></insert>
+
+    <update id="update" parameterType="com.zzyl.entity.NursingPlan">
+        UPDATE nursing_plan
+        SET plan_name   = #{planName},
+            update_time = #{updateTime},
+            update_by   = #{updateBy},
+            status= #{status},
+            sort_no= #{sortNo}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE
+        FROM nursing_plan
+        WHERE id = #{id}
+    </delete>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="NursingPlanMap">
+        SELECT a.id,
+               a.status,
+               a.sort_no,
+               a.plan_name,
+               a.create_by,
+               a.update_by,
+               a.remark,
+               a.create_time,
+               a.update_time,
+               p.id   as pid,
+               plan_id,
+               project_id,
+               execute_time,
+               execute_cycle,
+               execute_frequency,
+               p.create_by,
+               p.update_by,
+               p.remark,
+               p.create_time,
+               p.update_time,
+               n.name as project_name
+        from nursing_plan as a
+                 left join nursing_project_plan p ON p.plan_id = a.id
+                 left join nursing_project n on n.id = p.project_id
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="listAll" resultMap="NursingPlanMap">
+        SELECT a.id,
+               a.status,
+               a.sort_no,
+               a.plan_name,
+               a.create_by,
+               a.update_by,
+               a.remark,
+               a.create_time,
+               a.update_time,
+               p.id as pid,
+               plan_id,
+               project_id,
+               execute_time,
+               execute_cycle,
+               execute_frequency,
+               p.create_by,
+               p.update_by,
+               p.remark,
+               p.create_time,
+               p.update_time
+        from nursing_plan as a
+                 left join nursing_project_plan p ON p.plan_id = a.id
+        ORDER BY a.sort_no, a.create_time DESC
+    </select>
+
+    <select id="listByPage" resultMap="NursingPlanMap" parameterType="java.util.Map">
+        SELECT a.id, a.status, a.sort_no, a.plan_name, a.create_by, a.update_by, a.remark, a.create_time, a.update_time
+        , s.real_name as creator
+        FROM nursing_plan as a
+        LEFT JOIN sys_user s ON a.create_by = s.id
+        <where>
+            <if test="name != null and name != ''">
+                and a.plan_name like CONCAT('%',#{name},'%')
+            </if>
+
+            <if test="status != null">
+                and a.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.sort_no, a.create_time DESC
+    </select>
+
+    <update id="updateStatus">
+        UPDATE nursing_plan
+        SET status      = #{status},
+            update_time = #{updateTime},
+            update_by   = #{updateBy}
+        WHERE id = #{id}
+    </update>
+</mapper>

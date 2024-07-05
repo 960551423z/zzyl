@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.BedMapper">
+    <resultMap id="BedResultMap" type="com.zzyl.entity.Bed">
+        <id column="id" property="id"/>
+        <result column="bed_number" property="bedNumber"/>
+        <result column="bed_status" property="bedStatus"/>
+        <result column="room_id" property="roomId"/>
+        <result property="sort" column="sort"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="BedVoResultMap" type="com.zzyl.vo.BedVo">
+        <id column="id" property="id"/>
+        <result column="bed_number" property="bedNumber"/>
+        <result column="bed_status" property="bedStatus"/>
+        <result column="room_id" property="roomId"/>
+        <result property="sort" column="sort"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="lname" property="lname"/>
+        <result column="ename" property="name"/>
+        <result column="eid" property="elderId"/>
+        <result column="price" property="price"/>
+
+        <collection property="checkInConfigVo" ofType="com.zzyl.vo.CheckInConfigVo">
+            <id column="id" jdbcType="BIGINT" property="id"/>
+            <result column="elder_id" jdbcType="BIGINT" property="elderId"/>
+            <result column="check_in_start_time" jdbcType="TIMESTAMP" property="checkInStartTime"/>
+            <result column="check_in_end_time" jdbcType="TIMESTAMP" property="checkInEndTime"/>
+            <result column="nursing_level_id" jdbcType="BIGINT" property="nursingLevelId"/>
+            <result column="bed_no" jdbcType="VARCHAR" property="bedNo"/>
+            <result column="cost_start_time" jdbcType="TIMESTAMP" property="costStartTime"/>
+            <result column="cost_end_time" jdbcType="TIMESTAMP" property="costEndTime"/>
+            <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount"/>
+            <result column="nursing_cost" jdbcType="DECIMAL" property="nursingCost"/>
+            <result column="bed_cost" jdbcType="DECIMAL" property="bedCost"/>
+            <result column="other_cost" jdbcType="DECIMAL" property="otherCost"/>
+            <result column="medical_insurance_payment" jdbcType="DECIMAL" property="medicalInsurancePayment"/>
+            <result column="government_subsidy" jdbcType="DECIMAL" property="governmentSubsidy"/>
+            <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+            <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+            <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+            <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+            <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        </collection>
+    </resultMap>
+
+
+    <insert id="addBed" parameterType="com.zzyl.entity.Bed">
+        insert into bed(bed_number, sort, bed_status, room_id, create_by, update_by, remark, create_time, update_time)
+        values (#{bedNumber}, #{sort}, #{bedStatus}, #{roomId}, #{createBy}, #{updateBy}, #{remark}, #{createTime},
+                #{updateTime})
+    </insert>
+    <delete id="deleteBedById" parameterType="java.lang.Long">
+        delete
+        from bed
+        where id = #{id}
+    </delete>
+    <update id="updateBed" parameterType="com.zzyl.entity.Bed">
+        update bed
+        set bed_number  = #{bedNumber},
+            sort        = #{sort},
+            bed_status  = #{bedStatus},
+            room_id     = #{roomId},
+            update_time = #{updateTime},
+            update_by   = #{updateBy}
+        where id = #{id}
+    </update>
+    <select id="getBedById" resultMap="BedResultMap" parameterType="java.lang.Long">
+        select id, bed_number, sort, bed_status, room_id
+        from bed
+        where id = #{id}
+    </select>
+    <select id="getAllBeds" resultMap="BedResultMap">
+        select id, bed_number, sort, bed_status, room_id
+        from bed
+        order by sort
+    </select>
+
+    <select id="getBedsByRoomId" resultMap="BedVoResultMap" parameterType="java.lang.Long">
+        select b.*,
+               nl.name as lname
+                ,
+               e.name  as ename,
+               e.id    as eid,
+               cc.*
+        from bed b
+                 left join elder e on b.id = e.bed_id
+                 left join check_in_config cc on cc.elder_id = e.id
+                 left join nursing_level nl on nl.id = cc.nursing_level_id
+        where b.room_id = #{roomId}
+        order by b.sort, b.create_time desc
+    </select>
+    <select id="getBedByNum" resultType="com.zzyl.entity.Bed">
+        select id, bed_number, sort, bed_status, room_id
+        from bed
+        where bed_number = #{bedNumber}
+    </select>
+</mapper>

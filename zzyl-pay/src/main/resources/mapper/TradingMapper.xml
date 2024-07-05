@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzyl.mapper.TradingMapper">
+    <resultMap id="BaseResultMap" type="com.zzyl.entity.Trading">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="product_order_no" jdbcType="BIGINT" property="productOrderNo"/>
+        <result column="trading_order_no" jdbcType="BIGINT" property="tradingOrderNo"/>
+        <result column="trading_channel" jdbcType="VARCHAR" property="tradingChannel"/>
+        <result column="trading_type" jdbcType="VARCHAR" property="tradingType"/>
+        <result column="trading_state" jdbcType="INTEGER" property="tradingState"/>
+        <result column="payee_name" jdbcType="VARCHAR" property="payeeName"/>
+        <result column="payee_id" jdbcType="BIGINT" property="payeeId"/>
+        <result column="payer_name" jdbcType="VARCHAR" property="payerName"/>
+        <result column="payer_id" jdbcType="BIGINT" property="payerId"/>
+        <result column="trading_amount" jdbcType="DECIMAL" property="tradingAmount"/>
+        <result column="refund" jdbcType="DECIMAL" property="refund"/>
+        <result column="is_refund" jdbcType="VARCHAR" property="isRefund"/>
+        <result column="result_code" jdbcType="VARCHAR" property="resultCode"/>
+        <result column="result_msg" jdbcType="VARCHAR" property="resultMsg"/>
+        <result column="result_json" jdbcType="VARCHAR" property="resultJson"/>
+        <result column="place_order_code" jdbcType="VARCHAR" property="placeOrderCode"/>
+        <result column="place_order_msg" jdbcType="VARCHAR" property="placeOrderMsg"/>
+        <result column="enterprise_id" jdbcType="BIGINT" property="enterpriseId"/>
+        <result column="memo" jdbcType="VARCHAR" property="memo"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="enable_flag" jdbcType="VARCHAR" property="enableFlag"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.zzyl.entity.Trading">
+        <result column="place_order_json" jdbcType="LONGVARCHAR" property="placeOrderJson"/>
+        <result column="qr_code" jdbcType="LONGVARCHAR" property="qrCode"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        , product_order_no, trading_order_no, trading_channel, trading_type, trading_state,
+    payee_name, payee_id, payer_name, payer_id, trading_amount, refund, is_refund, result_code,
+    result_msg, result_json, place_order_code, place_order_msg, enterprise_id, memo,
+    open_id, enable_flag, create_time, update_time, create_by, update_by, remark
+    </sql>
+    <sql id="Blob_Column_List">
+        place_order_json
+        , qr_code
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from trading
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from trading
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zzyl.entity.Trading">
+        insert into trading (id, product_order_no, trading_order_no,
+                             trading_channel, trading_type, trading_state,
+                             payee_name, payee_id, payer_name,
+                             payer_id, trading_amount, refund,
+                             is_refund, result_code, result_msg,
+                             result_json, place_order_code, place_order_msg,
+                             enterprise_id, memo, open_id,
+                             enable_flag, create_time, update_time,
+                             create_by, update_by, remark,
+                             place_order_json, qr_code)
+        values (#{id,jdbcType=BIGINT}, #{productOrderNo,jdbcType=BIGINT}, #{tradingOrderNo,jdbcType=BIGINT},
+                #{tradingChannel,jdbcType=VARCHAR}, #{tradingType,jdbcType=VARCHAR}, #{tradingState,jdbcType=INTEGER},
+                #{payeeName,jdbcType=VARCHAR}, #{payeeId,jdbcType=BIGINT}, #{payerName,jdbcType=VARCHAR},
+                #{payerId,jdbcType=BIGINT}, #{tradingAmount,jdbcType=DECIMAL}, #{refund,jdbcType=DECIMAL},
+                #{isRefund,jdbcType=VARCHAR}, #{resultCode,jdbcType=VARCHAR}, #{resultMsg,jdbcType=VARCHAR},
+                #{resultJson,jdbcType=VARCHAR}, #{placeOrderCode,jdbcType=VARCHAR}, #{placeOrderMsg,jdbcType=VARCHAR},
+                #{enterpriseId,jdbcType=BIGINT}, #{memo,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR},
+                #{enableFlag,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+                #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR},
+                #{placeOrderJson,jdbcType=LONGVARCHAR}, #{qrCode,jdbcType=LONGVARCHAR})
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO trading (
+        id,
+        product_order_no,
+        trading_order_no,
+        trading_channel,
+        trading_type,
+        trading_state,
+        payee_name,
+        payee_id,
+        payer_name,
+        payer_id,
+        trading_amount,
+        refund,
+        is_refund,
+        result_code,
+        result_msg,
+        result_json,
+        place_order_code,
+        place_order_msg,
+        enterprise_id,
+        memo,
+        open_id,
+        enable_flag,
+        create_time,
+        update_time,
+        create_by,
+        update_by,
+        remark,
+        place_order_json,
+        qr_code
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.productOrderNo}, #{item.tradingOrderNo}, #{item.tradingChannel}, #{item.tradingType},
+            #{item.tradingState}, #{item.payeeName}, #{item.payeeId}, #{item.payerName}, #{item.payerId},
+            #{item.tradingAmount}, #{item.refund}, #{item.isRefund}, #{item.resultCode}, #{item.resultMsg},
+            #{item.resultJson}, #{item.placeOrderCode}, #{item.placeOrderMsg}, #{item.enterpriseId}, #{item.memo},
+            #{item.openId}, #{item.enableFlag}, #{item.createTime}, #{item.updateTime}, #{item.createBy},
+            #{item.updateBy}, #{item.remark}, #{item.placeOrderJson}, #{item.qrCode})
+        </foreach>
+    </insert>
+    <insert id="insertSelective" parameterType="com.zzyl.entity.Trading">
+        insert into trading
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="productOrderNo != null">
+                product_order_no,
+            </if>
+            <if test="tradingOrderNo != null">
+                trading_order_no,
+            </if>
+            <if test="tradingChannel != null">
+                trading_channel,
+            </if>
+            <if test="tradingType != null">
+                trading_type,
+            </if>
+            <if test="tradingState != null">
+                trading_state,
+            </if>
+            <if test="payeeName != null">
+                payee_name,
+            </if>
+            <if test="payeeId != null">
+                payee_id,
+            </if>
+            <if test="payerName != null">
+                payer_name,
+            </if>
+            <if test="payerId != null">
+                payer_id,
+            </if>
+            <if test="tradingAmount != null">
+                trading_amount,
+            </if>
+            <if test="refund != null">
+                refund,
+            </if>
+            <if test="isRefund != null">
+                is_refund,
+            </if>
+            <if test="resultCode != null">
+                result_code,
+            </if>
+            <if test="resultMsg != null">
+                result_msg,
+            </if>
+            <if test="resultJson != null">
+                result_json,
+            </if>
+            <if test="placeOrderCode != null">
+                place_order_code,
+            </if>
+            <if test="placeOrderMsg != null">
+                place_order_msg,
+            </if>
+            <if test="enterpriseId != null">
+                enterprise_id,
+            </if>
+            <if test="memo != null">
+                memo,
+            </if>
+            <if test="openId != null">
+                open_id,
+            </if>
+            <if test="enableFlag != null">
+                enable_flag,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="placeOrderJson != null">
+                place_order_json,
+            </if>
+            <if test="qrCode != null">
+                qr_code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="productOrderNo != null">
+                #{productOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="tradingOrderNo != null">
+                #{tradingOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="tradingChannel != null">
+                #{tradingChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="tradingType != null">
+                #{tradingType,jdbcType=VARCHAR},
+            </if>
+            <if test="tradingState != null">
+                #{tradingState,jdbcType=INTEGER},
+            </if>
+            <if test="payeeName != null">
+                #{payeeName,jdbcType=VARCHAR},
+            </if>
+            <if test="payeeId != null">
+                #{payeeId,jdbcType=BIGINT},
+            </if>
+            <if test="payerName != null">
+                #{payerName,jdbcType=VARCHAR},
+            </if>
+            <if test="payerId != null">
+                #{payerId,jdbcType=BIGINT},
+            </if>
+            <if test="tradingAmount != null">
+                #{tradingAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="refund != null">
+                #{refund,jdbcType=DECIMAL},
+            </if>
+            <if test="isRefund != null">
+                #{isRefund,jdbcType=VARCHAR},
+            </if>
+            <if test="resultCode != null">
+                #{resultCode,jdbcType=VARCHAR},
+            </if>
+            <if test="resultMsg != null">
+                #{resultMsg,jdbcType=VARCHAR},
+            </if>
+            <if test="resultJson != null">
+                #{resultJson,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderCode != null">
+                #{placeOrderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderMsg != null">
+                #{placeOrderMsg,jdbcType=VARCHAR},
+            </if>
+            <if test="enterpriseId != null">
+                #{enterpriseId,jdbcType=BIGINT},
+            </if>
+            <if test="memo != null">
+                #{memo,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="enableFlag != null">
+                #{enableFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderJson != null">
+                #{placeOrderJson,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="qrCode != null">
+                #{qrCode,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zzyl.entity.Trading">
+        update trading
+        <set>
+            <if test="productOrderNo != null">
+                product_order_no = #{productOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="tradingOrderNo != null">
+                trading_order_no = #{tradingOrderNo,jdbcType=BIGINT},
+            </if>
+            <if test="tradingChannel != null">
+                trading_channel = #{tradingChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="tradingType != null">
+                trading_type = #{tradingType,jdbcType=VARCHAR},
+            </if>
+            <if test="tradingState != null">
+                trading_state = #{tradingState,jdbcType=INTEGER},
+            </if>
+            <if test="payeeName != null">
+                payee_name = #{payeeName,jdbcType=VARCHAR},
+            </if>
+            <if test="payeeId != null">
+                payee_id = #{payeeId,jdbcType=BIGINT},
+            </if>
+            <if test="payerName != null">
+                payer_name = #{payerName,jdbcType=VARCHAR},
+            </if>
+            <if test="payerId != null">
+                payer_id = #{payerId,jdbcType=BIGINT},
+            </if>
+            <if test="tradingAmount != null">
+                trading_amount = #{tradingAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="refund != null">
+                refund = #{refund,jdbcType=DECIMAL},
+            </if>
+            <if test="isRefund != null">
+                is_refund = #{isRefund,jdbcType=VARCHAR},
+            </if>
+            <if test="resultCode != null">
+                result_code = #{resultCode,jdbcType=VARCHAR},
+            </if>
+            <if test="resultMsg != null">
+                result_msg = #{resultMsg,jdbcType=VARCHAR},
+            </if>
+            <if test="resultJson != null">
+                result_json = #{resultJson,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderCode != null">
+                place_order_code = #{placeOrderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderMsg != null">
+                place_order_msg = #{placeOrderMsg,jdbcType=VARCHAR},
+            </if>
+            <if test="enterpriseId != null">
+                enterprise_id = #{enterpriseId,jdbcType=BIGINT},
+            </if>
+            <if test="memo != null">
+                memo = #{memo,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="enableFlag != null">
+                enable_flag = #{enableFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderJson != null">
+                place_order_json = #{placeOrderJson,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="qrCode != null">
+                qr_code = #{qrCode,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zzyl.entity.Trading">
+        update trading
+        set product_order_no = #{productOrderNo,jdbcType=BIGINT},
+            trading_order_no = #{tradingOrderNo,jdbcType=BIGINT},
+            trading_channel  = #{tradingChannel,jdbcType=VARCHAR},
+            trading_type     = #{tradingType,jdbcType=VARCHAR},
+            trading_state    = #{tradingState,jdbcType=INTEGER},
+            payee_name       = #{payeeName,jdbcType=VARCHAR},
+            payee_id         = #{payeeId,jdbcType=BIGINT},
+            payer_name       = #{payerName,jdbcType=VARCHAR},
+            payer_id         = #{payerId,jdbcType=BIGINT},
+            trading_amount   = #{tradingAmount,jdbcType=DECIMAL},
+            refund           = #{refund,jdbcType=DECIMAL},
+            is_refund        = #{isRefund,jdbcType=VARCHAR},
+            result_code      = #{resultCode,jdbcType=VARCHAR},
+            result_msg       = #{resultMsg,jdbcType=VARCHAR},
+            result_json      = #{resultJson,jdbcType=VARCHAR},
+            place_order_code = #{placeOrderCode,jdbcType=VARCHAR},
+            place_order_msg  = #{placeOrderMsg,jdbcType=VARCHAR},
+            enterprise_id    = #{enterpriseId,jdbcType=BIGINT},
+            memo             = #{memo,jdbcType=VARCHAR},
+            open_id          = #{openId,jdbcType=VARCHAR},
+            enable_flag      = #{enableFlag,jdbcType=VARCHAR},
+            create_time      = #{createTime,jdbcType=TIMESTAMP},
+            update_time      = #{updateTime,jdbcType=TIMESTAMP},
+            create_by        = #{createBy,jdbcType=BIGINT},
+            update_by        = #{updateBy,jdbcType=BIGINT},
+            remark           = #{remark,jdbcType=VARCHAR},
+            place_order_json = #{placeOrderJson,jdbcType=LONGVARCHAR},
+            qr_code          = #{qrCode,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Trading">
+        update trading
+        set product_order_no = #{productOrderNo,jdbcType=BIGINT},
+            trading_order_no = #{tradingOrderNo,jdbcType=BIGINT},
+            trading_channel  = #{tradingChannel,jdbcType=VARCHAR},
+            trading_type     = #{tradingType,jdbcType=VARCHAR},
+            trading_state    = #{tradingState,jdbcType=INTEGER},
+            payee_name       = #{payeeName,jdbcType=VARCHAR},
+            payee_id         = #{payeeId,jdbcType=BIGINT},
+            payer_name       = #{payerName,jdbcType=VARCHAR},
+            payer_id         = #{payerId,jdbcType=BIGINT},
+            trading_amount   = #{tradingAmount,jdbcType=DECIMAL},
+            refund           = #{refund,jdbcType=DECIMAL},
+            is_refund        = #{isRefund,jdbcType=VARCHAR},
+            result_code      = #{resultCode,jdbcType=VARCHAR},
+            result_msg       = #{resultMsg,jdbcType=VARCHAR},
+            result_json      = #{resultJson,jdbcType=VARCHAR},
+            place_order_code = #{placeOrderCode,jdbcType=VARCHAR},
+            place_order_msg  = #{placeOrderMsg,jdbcType=VARCHAR},
+            enterprise_id    = #{enterpriseId,jdbcType=BIGINT},
+            memo             = #{memo,jdbcType=VARCHAR},
+            open_id          = #{openId,jdbcType=VARCHAR},
+            enable_flag      = #{enableFlag,jdbcType=VARCHAR},
+            create_time      = #{createTime,jdbcType=TIMESTAMP},
+            update_time      = #{updateTime,jdbcType=TIMESTAMP},
+            create_by        = #{createBy,jdbcType=BIGINT},
+            update_by        = #{updateBy,jdbcType=BIGINT},
+            remark           = #{remark,jdbcType=VARCHAR}
+
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByTradingOrderNo" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT *
+        FROM trading
+        WHERE trading_order_no = #{tradingOrderNo}
+    </select>
+
+    <select id="selectByProductOrderNo" resultMap="BaseResultMap">
+        SELECT * FROM trading WHERE product_order_no = #{productOrderNo} and trading_type = #{tradingType}
+        <if test="tradingType == 1">
+            and trading_channel = '小程序支付'
+        </if>
+    </select>
+
+    <select id="selectListByTradingState" resultMap="BaseResultMap">
+        SELECT *
+        FROM trading
+        WHERE trading_state = #{tradingState}
+        ORDER BY create_time ASC LIMIT #{count}
+    </select>
+</mapper>
