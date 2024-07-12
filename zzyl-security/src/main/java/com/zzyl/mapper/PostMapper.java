@@ -44,5 +44,13 @@ public interface PostMapper {
      */
     public int deletePostByIds(@Param("postIds") String[] postIds);
 
-    void deletePostByDeptNo(@Param("deptId") String deptId);
+    int deletePostByDeptNo(@Param("deptIds") String deptIds);
+
+
+    /**
+     * 删除岗位
+     * @param postIds
+     * @return
+     */
+    int deletePostById(String postIds);
 }

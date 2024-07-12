@@ -396,4 +396,11 @@
             #{userId}
         </foreach>
     </select>
+
+    <!--查询是否关联用户-->
+    <select id="checkPostUser" resultType="com.zzyl.entity.User">
+        select * from sys_user
+        where post_no = #{postNo}
+    </select>
+
 </mapper>

@@ -97,19 +97,42 @@
         </if>
     </select>
 
+    <!--<select id="countReservationsForEachTimeWithinTimeRange" resultType="com.zzyl.vo.TimeCountVo">-->
+    <!--    SELECT time, 6 - COUNT(*) AS count-->
+    <!--    FROM reservation-->
+    <!--    WHERE `time` BETWEEN #{startTime}-->
+    <!--      AND #{endTime}-->
+    <!--      and status != 2-->
+    <!--    GROUP BY time-->
+    <!--</select>-->
+
     <select id="countReservationsForEachTimeWithinTimeRange" resultType="com.zzyl.vo.TimeCountVo">
         SELECT time, 6 - COUNT(*) AS count
         FROM reservation
         WHERE `time` BETWEEN #{startTime}
-          AND #{endTime}
+            AND #{endTime}
           and status != 2
         GROUP BY time
     </select>
 
+
     <select id="countCancelledReservationsWithinTimeRange" resultType="int">
-        SELECT COUNT(*) FROM reservation
-        WHERE update_time BETWEEN #{startTime} AND #{endTime}
-        AND status = 2
-        and update_by = #{updateBy}
+        select count(*) from reservation
+        where update_time BETWEEN #{startTime} AND #{endTime}
+          AND status = 2
+          and update_by = #{updateBy}
+    </select>
+
+    <select id="page" resultType="com.zzyl.entity.Reservation">
+        select * from reservation
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="userId != null">
+                and create_by = #{userId}
+            </if>
+        </where>
+        order by create_time desc
     </select>
 </mapper>

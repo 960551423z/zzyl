@@ -76,113 +76,113 @@ public class CheckInServiceImpl implements CheckInService {
     @Autowired
     private BedMapper bedMapper;
 
-    @Transactional
-    @Override
-    public ResponseResult<CheckInVo> createCheckIn(CheckInDto checkInDto) {
-        //1.验证状态
-        ElderVo elderVo = elderService.selectByIdCardAndName(checkInDto.getElderDto().getIdCardNo(), checkInDto.getElderDto().getName());
-        if (elderVo != null && checkInDto.getId() == null && !elderVo.getStatus().equals(5)) {
-            return ResponseResult.error(checkInDto.getElderDto().getName() + "已经发起了申请入住");
-        }
-        //获取当前登录人
-        String subject = UserThreadLocal.getSubject();
-        User user = JSON.parseObject(subject, User.class);
-
-        CheckIn checkIn = BeanUtil.toBean(checkInDto, CheckIn.class);
-        JSONObject jsonObject = JSON.parseObject(checkIn.getOtherApplyInfo(), JSONObject.class);
-        ElderDto elderDto = checkIn.getElderDto();
-
-        CheckInOtherDto checkInOtherDto = BeanUtil.toBean(checkInDto, CheckInOtherDto.class);
-        elderDto.setAge(jsonObject.getInteger("age").toString());
-        elderDto.setSex(jsonObject.getInteger("sex").toString());
-        jsonObject.put("checkInOtherDto", JSONUtil.toJsonStr(checkInOtherDto));
-        jsonObject.put("elderDto", JSONUtil.toJsonStr(checkIn.getElderDto()));
-
-        // 插入新的
-        elderDto.setImage(checkInDto.getUrl1());
-        //设置流程状态
-        checkIn.setFlowStatus(CheckIn.FlowStatus.REVIEW.getCode());
-        checkIn.setStatus(CheckIn.Status.APPLICATION.getCode());
-        checkIn.setApplicat(user.getRealName());
-        checkIn.setApplicatId(user.getId());
-        //设置修改时间-->方便前端判断数据新旧
-        checkIn.setUpdateTime(LocalDateTime.now());
-
-        //判断id是否为空
-        //id为空，则新增老人和入住信息
-        //id不为空，修改老人和修改入住信息
-        if (checkIn.getId() != null) {
-            CheckIn checkIn1 = checkInMapper.selectByPrimaryKey(checkIn.getId());
-            if (!user.getId().equals(checkIn1.getApplicatId())) {
-                return ResponseResult.error("不是申请人，不能提交数据");
-            }
-            JSONObject jsonObjectOld = JSON.parseObject(checkIn1.getOtherApplyInfo(), JSONObject.class);
-            String elderDtostrOld = jsonObjectOld.getString("elderDto");
-            ElderDto elderDtoOld = JSON.parseObject(elderDtostrOld, ElderDto.class);
-            Boolean flag = !elderDtoOld.getName().equals(elderDto.getName());
-            elderDto.setId(checkIn1.getElderId());
-            Elder elder = elderService.updateByPrimaryKeySelective(elderDto, flag);
-            //入住标题
-            String title = elder.getName() + "的入住申请";
-            checkIn.setTitle(title);
-            String elderDtostr = jsonObject.getString("elderDto");
-            ElderDto elderDto1 = JSON.parseObject(elderDtostr, ElderDto.class);
-            elderDto1.setName(elder.getName());
-            jsonObject.put("elderDto", JSONUtil.toJsonStr(elderDto1));
-            jsonObject.put("name", elder.getName());
-            checkIn.setOtherApplyInfo(JSONUtil.toJsonStr(jsonObject));
-            checkInMapper.updateByPrimaryKeySelective(checkIn);
-        } else {
-            //保存老人信息
-            Elder elder = elderService.insert(elderDto);
-            String elderDtostr = jsonObject.getString("elderDto");
-            ElderDto elderDto1 = JSON.parseObject(elderDtostr, ElderDto.class);
-            elderDto1.setName(elder.getName());
-            jsonObject.put("elderDto", JSONUtil.toJsonStr(elderDto1));
-            checkIn.setOtherApplyInfo(JSONUtil.toJsonStr(jsonObject));
-            checkIn.setElderId(elder.getId());
-            //入住标题
-            String title = elder.getName() + "的入住申请";
-            checkIn.setTitle(title);
-            //设置流程状态
-            checkIn.setFlowStatus(CheckIn.FlowStatus.REVIEW.getCode());
-            checkIn.setStatus(CheckIn.Status.APPLICATION.getCode());
-            checkIn.setApplicat(user.getRealName());
-            checkIn.setApplicatId(user.getId());
-
-            //申请人部门编号
-            String deptNo = user.getDeptNo();
-            String code = CodeUtil.generateCode(CHECK_IN_CODE_PREFIX, redisTemplate, 5);
-            checkIn.setCheckInCode(code);
-            checkIn.setDeptNo(deptNo);
-            checkIn.setCounselor(user.getRealName());
-            checkIn.setCreateTime(LocalDateTime.now());
-            checkInMapper.insert(checkIn);
-        }
-
-        //如果是修改的话，则直接完成流程即可
-        if (ObjectUtil.isNotEmpty(checkInDto.getTaskId())) {
-            actFlowCommService.completeProcess(checkIn.getTitle(), checkInDto.getTaskId(), user.getId().toString(), 1, checkIn.getStatus());
-        } else {
-            //准备流程变量
-            Map<String, Object> setvariables = setvariables(checkIn.getId());
-            //启动流程实例
-            actFlowCommService.start(checkIn.getId(), "checkIn", user, setvariables, true);
-        }
-
-        //保存审核记录
-        Long nextAssignee = actFlowCommService.getNextAssignee("checkIn", "checkIn:" + checkIn.getId());
-        RecoreVo recoreVo = getRecoreVo(
-                checkIn,
-                user,
-                AccraditationRecordConstant.AUDIT_STATUS_PASS,
-                "同意", "发起申请-申请入住",
-                "护理组组长处理-入住评估",
-                nextAssignee, AccraditationRecordConstant.RECORD_HANDLE_TYPE_PROCESSED);
-        accraditationRecordService.insert(recoreVo);
-
-        return ResponseResult.success(BeanUtil.toBean(checkIn, CheckInVo.class));
-    }
+//    @Transactional
+//    @Override
+//    public ResponseResult<CheckInVo> createCheckIn(CheckInDto checkInDto) {
+//        //1.验证状态
+//        ElderVo elderVo = elderService.selectByIdCardAndName(checkInDto.getElderDto().getIdCardNo(), checkInDto.getElderDto().getName());
+//        if (elderVo != null && checkInDto.getId() == null && !elderVo.getStatus().equals(5)) {
+//            return ResponseResult.error(checkInDto.getElderDto().getName() + "已经发起了申请入住");
+//        }
+//        //获取当前登录人
+//        String subject = UserThreadLocal.getSubject();
+//        User user = JSON.parseObject(subject, User.class);
+//
+//        CheckIn checkIn = BeanUtil.toBean(checkInDto, CheckIn.class);
+//        JSONObject jsonObject = JSON.parseObject(checkIn.getOtherApplyInfo(), JSONObject.class);
+//        ElderDto elderDto = checkIn.getElderDto();
+//
+//        CheckInOtherDto checkInOtherDto = BeanUtil.toBean(checkInDto, CheckInOtherDto.class);
+//        elderDto.setAge(jsonObject.getInteger("age").toString());
+//        elderDto.setSex(jsonObject.getInteger("sex").toString());
+//        jsonObject.put("checkInOtherDto", JSONUtil.toJsonStr(checkInOtherDto));
+//        jsonObject.put("elderDto", JSONUtil.toJsonStr(checkIn.getElderDto()));
+//
+//        // 插入新的
+//        elderDto.setImage(checkInDto.getUrl1());
+//        //设置流程状态
+//        checkIn.setFlowStatus(CheckIn.FlowStatus.REVIEW.getCode());
+//        checkIn.setStatus(CheckIn.Status.APPLICATION.getCode());
+//        checkIn.setApplicat(user.getRealName());
+//        checkIn.setApplicatId(user.getId());
+//        //设置修改时间-->方便前端判断数据新旧
+//        checkIn.setUpdateTime(LocalDateTime.now());
+//
+//        //判断id是否为空
+//        //id为空，则新增老人和入住信息
+//        //id不为空，修改老人和修改入住信息
+//        if (checkIn.getId() != null) {
+//            CheckIn checkIn1 = checkInMapper.selectByPrimaryKey(checkIn.getId());
+//            if (!user.getId().equals(checkIn1.getApplicatId())) {
+//                return ResponseResult.error("不是申请人，不能提交数据");
+//            }
+//            JSONObject jsonObjectOld = JSON.parseObject(checkIn1.getOtherApplyInfo(), JSONObject.class);
+//            String elderDtostrOld = jsonObjectOld.getString("elderDto");
+//            ElderDto elderDtoOld = JSON.parseObject(elderDtostrOld, ElderDto.class);
+//            Boolean flag = !elderDtoOld.getName().equals(elderDto.getName());
+//            elderDto.setId(checkIn1.getElderId());
+//            Elder elder = elderService.updateByPrimaryKeySelective(elderDto, flag);
+//            //入住标题
+//            String title = elder.getName() + "的入住申请";
+//            checkIn.setTitle(title);
+//            String elderDtostr = jsonObject.getString("elderDto");
+//            ElderDto elderDto1 = JSON.parseObject(elderDtostr, ElderDto.class);
+//            elderDto1.setName(elder.getName());
+//            jsonObject.put("elderDto", JSONUtil.toJsonStr(elderDto1));
+//            jsonObject.put("name", elder.getName());
+//            checkIn.setOtherApplyInfo(JSONUtil.toJsonStr(jsonObject));
+//            checkInMapper.updateByPrimaryKeySelective(checkIn);
+//        } else {
+//            //保存老人信息
+//            Elder elder = elderService.insert(elderDto);
+//            String elderDtostr = jsonObject.getString("elderDto");
+//            ElderDto elderDto1 = JSON.parseObject(elderDtostr, ElderDto.class);
+//            elderDto1.setName(elder.getName());
+//            jsonObject.put("elderDto", JSONUtil.toJsonStr(elderDto1));
+//            checkIn.setOtherApplyInfo(JSONUtil.toJsonStr(jsonObject));
+//            checkIn.setElderId(elder.getId());
+//            //入住标题
+//            String title = elder.getName() + "的入住申请";
+//            checkIn.setTitle(title);
+//            //设置流程状态
+//            checkIn.setFlowStatus(CheckIn.FlowStatus.REVIEW.getCode());
+//            checkIn.setStatus(CheckIn.Status.APPLICATION.getCode());
+//            checkIn.setApplicat(user.getRealName());
+//            checkIn.setApplicatId(user.getId());
+//
+//            //申请人部门编号
+//            String deptNo = user.getDeptNo();
+//            String code = CodeUtil.generateCode(CHECK_IN_CODE_PREFIX, redisTemplate, 5);
+//            checkIn.setCheckInCode(code);
+//            checkIn.setDeptNo(deptNo);
+//            checkIn.setCounselor(user.getRealName());
+//            checkIn.setCreateTime(LocalDateTime.now());
+//            checkInMapper.insert(checkIn);
+//        }
+//
+//        //如果是修改的话，则直接完成流程即可
+//        if (ObjectUtil.isNotEmpty(checkInDto.getTaskId())) {
+//            actFlowCommService.completeProcess(checkIn.getTitle(), checkInDto.getTaskId(), user.getId().toString(), 1, checkIn.getStatus());
+//        } else {
+//            //准备流程变量
+//            Map<String, Object> setvariables = setvariables(checkIn.getId());
+//            //启动流程实例
+//            actFlowCommService.start(checkIn.getId(), "checkIn", user, setvariables, true);
+//        }
+//
+//        //保存审核记录
+//        Long nextAssignee = actFlowCommService.getNextAssignee("checkIn", "checkIn:" + checkIn.getId());
+//        RecoreVo recoreVo = getRecoreVo(
+//                checkIn,
+//                user,
+//                AccraditationRecordConstant.AUDIT_STATUS_PASS,
+//                "同意", "发起申请-申请入住",
+//                "护理组组长处理-入住评估",
+//                nextAssignee, AccraditationRecordConstant.RECORD_HANDLE_TYPE_PROCESSED);
+//        accraditationRecordService.insert(recoreVo);
+//
+//        return ResponseResult.success(BeanUtil.toBean(checkIn, CheckInVo.class));
+//    }
 
     /**
      * 获取操作记录数据
@@ -574,48 +574,48 @@ public class CheckInServiceImpl implements CheckInService {
         return ResponseResult.success(BeanUtil.toBean(checkIn, CheckInVo.class));
     }
 
-    @Override
-    public Map<String, Object> setvariables(Long id) {
-        //设置流程变量
-        Map<String, Object> variables = new HashMap<>();
-
-        // 养老顾问
-        CheckIn checkIn = checkInMapper.selectByPrimaryKey(id);
-        Long applicatId = checkIn.getApplicatId();
-        variables.put("assignee0", applicatId);
-
-        variables.put("assignee0Name", checkIn.getApplicat());
-        variables.put("processTitle", checkIn.getTitle());
-
-        // 护理部部门编号
-        Dept dept = deptMapper.selectByDeptNo(RetreatConstant.NURSING_DEPT_CODE);
-        //部门领导id
-        Long leaderId = dept.getLeaderId();
-        variables.put("assignee1", leaderId);
-
-        // 副院长
-        List<Long> userIdList = userMapper.selectByDeptNo(RetreatConstant.DEAN_OFFICE_DEPT_CODE);
-        Long userId = userIdList.get(0);
-        variables.put("assignee2", userId);
-
-        // 养老顾问
-        variables.put("assignee3", applicatId);
-
-        // 法务员工
-        //设置下一个审核人
-        //找到法务部门编号--->通过编号查询法务中所有的员工（非leader）---->获取第一个人，找到这个人的id,然后查询对应的角色
-        List<Long> legatUser = userMapper.selectByDeptNo(RetreatConstant.LEGAL_DEPT_CODE);
-        Long legatUserId = legatUser.get(legatUser.size() - 1);
-        variables.put("assignee4", legatUserId);
-
-        // 流程类型入住
-        variables.put("processType", 3);
-
-        // 流程类型入住
-        variables.put("processCode", checkIn.getCheckInCode());
-
-        // 流程类型入住
-        variables.put("processStatus", 1);
-        return variables;
-    }
+//    @Override
+//    public Map<String, Object> setvariables(Long id) {
+//        //设置流程变量
+//        Map<String, Object> variables = new HashMap<>();
+//
+//        // 养老顾问
+//        CheckIn checkIn = checkInMapper.selectByPrimaryKey(id);
+//        Long applicatId = checkIn.getApplicatId();
+//        variables.put("assignee0", applicatId);
+//
+//        variables.put("assignee0Name", checkIn.getApplicat());
+//        variables.put("processTitle", checkIn.getTitle());
+//
+//        // 护理部部门编号
+//        Dept dept = deptMapper.selectByDeptNo(RetreatConstant.NURSING_DEPT_CODE);
+//        //部门领导id
+//        Long leaderId = dept.getLeaderId();
+//        variables.put("assignee1", leaderId);
+//
+//        // 副院长
+//        List<Long> userIdList = userMapper.selectByDeptNo(RetreatConstant.DEAN_OFFICE_DEPT_CODE);
+//        Long userId = userIdList.get(0);
+//        variables.put("assignee2", userId);
+//
+//        // 养老顾问
+//        variables.put("assignee3", applicatId);
+//
+//        // 法务员工
+//        //设置下一个审核人
+//        //找到法务部门编号--->通过编号查询法务中所有的员工（非leader）---->获取第一个人，找到这个人的id,然后查询对应的角色
+//        List<Long> legatUser = userMapper.selectByDeptNo(RetreatConstant.LEGAL_DEPT_CODE);
+//        Long legatUserId = legatUser.get(legatUser.size() - 1);
+//        variables.put("assignee4", legatUserId);
+//
+//        // 流程类型入住
+//        variables.put("processType", 3);
+//
+//        // 流程类型入住
+//        variables.put("processCode", checkIn.getCheckInCode());
+//
+//        // 流程类型入住
+//        variables.put("processStatus", 1);
+//        return variables;
+//    }
 }

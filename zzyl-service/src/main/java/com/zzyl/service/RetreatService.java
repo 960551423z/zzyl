@@ -14,7 +14,7 @@ public interface RetreatService {
      * 退住申请
      * @param retreatDto
      */
-    public ResponseResult createRetreat(Retreat retreatDto);
+//    public ResponseResult createRetreat(Retreat retreatDto);
 
     /**
      * 查询退住信息

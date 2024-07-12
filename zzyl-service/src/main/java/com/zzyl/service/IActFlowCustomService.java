@@ -13,6 +13,6 @@ public interface IActFlowCustomService {
 	 * @param id
 	 * @return
 	 */
-	Map<String, Object> setvariables(Long id);
+//	Map<String, Object> setvariables(Long id);
 
 }

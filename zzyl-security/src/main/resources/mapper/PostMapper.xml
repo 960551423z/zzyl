@@ -108,13 +108,14 @@
             </if>
         </trim>
     </insert>
+
     <select id="selectPage" parameterType="com.zzyl.dto.PostDto" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from sys_post
         <where>
             <if test="postDto.postNo!=null and postDto.postNo!=''">
-                and post_no=#{postDto.postNo}
+                and post_no = #{postDto.postNo}
             </if>
             <if test="postDto.postName!=null and postDto.postName!=''">
                 and post_name like concat('%',#{postDto.postName},'%')
@@ -123,7 +124,7 @@
                 and dept_no = #{postDto.deptNo}
             </if>
             <if test="postDto.dataState!=null and postDto.dataState!=''">
-                and data_state=#{postDto.dataState}
+                and data_state = #{postDto.dataState}
             </if>
         </where>
         order by create_time desc
@@ -204,6 +205,8 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <!--修改岗位-->
     <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Post">
         update sys_post
         <set>
@@ -247,10 +250,18 @@
             #{postId}
         </foreach>
     </delete>
+    <!--删除-->
     <delete id="deletePostByDeptNo">
         delete
         from sys_post
-        where dept_no = #{deptId}
+        where dept_no = #{deptIds}
+    </delete>
+
+    <!--删除-->
+    <delete id="deletePostById">
+        delete
+        from sys_post
+        where post_no = #{postIds}
     </delete>
 
     <select id="checkPostHasUser" resultType="Integer">
@@ -263,4 +274,6 @@
             #{index}
         </foreach>
     </select>
+
+
 </mapper>

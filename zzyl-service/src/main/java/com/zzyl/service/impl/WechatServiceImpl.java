@@ -38,16 +38,14 @@ public class WechatServiceImpl implements WechatService {
      * @return 唯一标识
      */
     @Override
-    public JSONObject getOpenid(String code) {
+    public String getOpenId(String code) {
         Map<String, Object> requestUrlParam = getAppConfig();
-        // 小程序端授权后的code 登录临时凭证
-        requestUrlParam.put("js_code", code);
-        // 发送post请求读取调用微信接口获取openid用户唯一标识
+        requestUrlParam.put("js_code",code);
         String result = HttpUtil.get(REQUEST_URL, requestUrlParam);
         log.info("getOpenid result:{}", result);
-        // {"session_key":"QbEw1Bp2OpkeCQ36gXvPRg==","openid":"oV4KY1Exd7NebGjfbYK7_KTPeNm4"}
-        return JSONUtil.parseObj(result);
-
+        // 字符串转换成Json
+        JSONObject jsonObject = JSONUtil.parseObj(result);
+        return jsonObject.getStr("openid");
     }
 
     /**
@@ -60,7 +58,7 @@ public class WechatServiceImpl implements WechatService {
         log.info("getToken result:{}", result);
         JSONObject jsonObject = JSONUtil.parseObj(result);
         //若code不正确，则获取不到openid，响应失败
-        if (ObjectUtil.isNotEmpty(jsonObject.getInt("errcode"))) {
+        if (jsonObject.getInt("errcode") != 0) {
             throw new BaseException(jsonObject.getStr("errmsg"));
         }
         return jsonObject.getStr("access_token");

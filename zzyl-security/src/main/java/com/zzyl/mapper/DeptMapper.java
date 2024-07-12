@@ -1,56 +1,55 @@
 package com.zzyl.mapper;
 
+
 import com.zzyl.dto.DeptDto;
 import com.zzyl.entity.Dept;
 import com.zzyl.vo.DeptVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
 @Mapper
 public interface DeptMapper {
 
-    int insert(Dept record);
-
-    Dept selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKey(Dept record);
-
-    List<Dept> selectList(@Param("deptDto") DeptDto deptDto);
-
-    List<Dept> findDeptInDeptNos(@Param("deptNos")List<String> deptNos);
-
-    List<DeptVo> findDeptVoListInRoleId(@Param("roleIds")List<Long> roleIds);
-
-    Dept selectByDeptNo(@Param("deptNo") String deptNo);
 
     /**
-     * 是否存在子节点
+     * 部门列表
      *
-     * @param deptId 部门ID
-     * @return 结果
      */
-    public int hasChildByDeptId(@Param("deptId") String deptId);
+    List<DeptVo> getList(DeptDto deptDto);
 
     /**
-     * 查询部门是否存在用户
-     *
-     * @param deptId 部门ID
-     * @return 结果
+     * 新增部门
      */
-    public int checkDeptExistUser(@Param("deptId") String deptId);
+    int insert(Dept dept);
 
     /**
-     * 删除部门管理信息
-     *
-     * @param deptId 部门ID
-     * @return 结果
+     * 部门修改
      */
-    public int deleteByDeptNo(@Param("deptId") String deptId);
+    int update(Dept dept);
 
-    @Update("update sys_dept set leader_id = null where leader_id = #{leaderId} and dept_no != #{deptNo} ")
-    void clearOtherDeptLeader(@Param("leaderId") Long leaderId,@Param("deptNo")String deptNo);
+    /**
+     * 部门删除
+     */
+    int delete(Long deptId);
+
+
+    /**
+     * 查询禁用状态下是否还有其他子节点
+     */
+    List<Dept> selectNode(String deptNo);
+
+    @Select("select * from sys_dept where parent_dept_no = #{deptNo}")
+    List<Dept> selectByDept(String deptNo);
+
+    @Select("select * from sys_dept where id = #{deptId}")
+    Dept selectByDeptId(Long deptId);
+
+
+    /**
+     * 根据部门id批量查询
+     */
+    List<Dept> selectByBatchDeptNos(@Param("deptNos") List<String> deptNos);
 }

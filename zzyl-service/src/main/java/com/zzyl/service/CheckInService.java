@@ -14,7 +14,7 @@ public interface CheckInService extends IActFlowCustomService {
      * 入住申请
      * @param checkInDto
      */
-    ResponseResult createCheckIn(CheckInDto checkInDto);
+//    ResponseResult createCheckIn(CheckInDto checkInDto);
 
     /**
      * 查询入住信息

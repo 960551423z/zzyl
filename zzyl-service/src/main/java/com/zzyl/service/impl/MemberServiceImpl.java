@@ -22,9 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,31 +43,86 @@ public class MemberServiceImpl implements MemberService {
 
 
     static ArrayList DEFAULT_NICKNAME_PREFIX = Lists.newArrayList(
-         "生活更美好",
-                    "大桔大利",
-                    "日富一日",
-                    "好柿开花",
-                    "柿柿如意",
-                    "一椰暴富",
-                    "大柚所为",
-                    "杨梅吐气",
-                    "天生荔枝"
-                    );
+            "生活更美好",
+            "大桔大利",
+            "日富一日",
+            "好柿开花",
+            "柿柿如意",
+            "一椰暴富",
+            "大柚所为",
+            "杨梅吐气",
+            "天生荔枝"
+    );
+
+    private static final String[] OPERATOR_PREFIXES = {
+            "130", "131", "132", "133", "134", "135", "136", "137", "138", "139",
+            "145", "147", "150", "151", "152", "153", "155", "156", "157", "158", "159",
+            "176", "177", "178", "180", "181", "182", "183", "184", "185", "186", "187", "188"
+    };
+
+    static String RandomPhone() {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+
+        // 不包括以0开头的四位数
+        int firstDigit = random.nextInt(9) + 1; // 1-9之间的随机数
+        sb.append(firstDigit);
+
+        // 接下来的三位数字可以是0-9之间的任意数字
+        for (int i = 0; i < 3; i++) {
+            int digit = random.nextInt(10); // 0-9之间的随机数
+            sb.append(digit);
+        }
+
+        return sb.toString();
+    }
+
+
+    /**
+     * 随机生成手机号
+     * @return 11位手机号
+     */
+    static String generateRandomPhoneNumber() {
+        Random random = new Random();
+
+        // 随机选择一个运营商号段
+        String prefix = OPERATOR_PREFIXES[random.nextInt(OPERATOR_PREFIXES.length)];
+
+        // 生成后八位随机数
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            sb.append(random.nextInt(10)); // 0-9之间的随机数
+        }
+
+        // 拼接完整的手机号
+        return prefix + sb;
+    }
+
     /**
      * 新增
+     *
      * @param member 用户信息
      */
     @Override
     public void save(Member member) {
         //判断id是否存在，不存在则新增，否则是更新
-        if (ObjectUtil.isEmpty(member.getId())) {
-            //随机组装昵称，随机词组+手机号后4位
-            String nickName = DEFAULT_NICKNAME_PREFIX.get((int)(Math.random() * DEFAULT_NICKNAME_PREFIX.size())) + StringUtils.substring(member.getPhone(), 7);
-            member.setName(nickName);
-            memberMapper.save(member);
-            return;
-        }
-        update(member);
+//        if (ObjectUtil.isEmpty(member.getId())) {
+//            //随机组装昵称，随机词组+手机号后4位
+//            String nickName = DEFAULT_NICKNAME_PREFIX.get((int)(Math.random() * DEFAULT_NICKNAME_PREFIX.size()))
+//                    + RandomPhone();
+//            member.setName(nickName);
+//            memberMapper.save(member);
+//            return;
+//        }
+//        update(member);
+
+
+        //随机组装昵称，随机词组+手机号后4位
+        String nickName = DEFAULT_NICKNAME_PREFIX.get((int) (Math.random() * DEFAULT_NICKNAME_PREFIX.size()))
+                + RandomPhone();
+        member.setName(nickName);
+        memberMapper.save(member);
+
     }
 
     /**
@@ -92,49 +145,28 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public LoginVo login(UserLoginRequestDto userLoginRequestDto) throws IOException {
         // 1 调用微信开放平台小程序的api，根据code获取openid
-        JSONObject jsonObject = wechatService.getOpenid(userLoginRequestDto.getCode());
-        // 2 若code不正确，则获取不到openid，响应失败
-        if (ObjectUtil.isNotEmpty(jsonObject.getInt("errcode"))) {
-            throw new BaseException(jsonObject.getStr("errmsg"));
-        }
-        String openId = jsonObject.getStr("openid");
+        String openId = wechatService.getOpenId(userLoginRequestDto.getCode());
 
-        /*
-        * 3 根据openid从数据库查询用户
-        * 3.1 如果为新用户，此处返回为null
-        * 3.2 如果为已经登录过的老用户，此处返回为user对象 （包含openId,phone,unionId等字段）
-         */
+        // 查询数据库中是否存在
         Member member = getByOpenid(openId);
 
-        /*
-         * 4 构造用户数据，设置openId,unionId
-         * 4.1 如果member为null，则为新用户，需要构建新的member对象，并设置openId
-         * 4.2 如果member不为null，则为老用户，无需设置openId
-         */
 
-        member = ObjectUtil.isNotEmpty(member) ? member : Member.builder()
-                .openId(openId)
-                .build();
-
-
-        // 5 调用微信开放平台小程序的api获取微信绑定的手机号
-        String phone = wechatService.getPhone(userLoginRequestDto.getPhoneCode());
-
-        /*
-         * 6 新用户绑定手机号或者老用户更新手机号
-         * 6.1 如果user.getPhone()为null，则为新用户，需要设置手机号，并保存数据库
-         * 6.2 如果user.getPhone()不为null，但是与微信获取到的手机号不一样  则表示用户改了微信绑定的手机号，需要设置手机号，并保存数据库
-         * 以上俩种情况，都需要重新设置手机号，并保存数据库
-         */
-        if (ObjectUtil.notEqual(member.getPhone(), phone)) {
+        // 不存在则添加到数据库中
+        if (member == null) {
+            // 新用户
+            String phone = generateRandomPhoneNumber();
             member.setPhone(phone);
             save(member);
         }
 
+
+
+
         // 7 将用户ID存入token
-        Map<String, Object> claims = MapUtil.<String, Object>builder()
-                .put(Constants.JWT_USERID, member.getId()).build();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(Constants.JWT_USERID, member.getId());
         claims.put(Constants.JWT_USERNAME, member.getName());
+
         // 8 封装token，响应结果
         String token = JwtUtil.createJWT(jwtTokenManagerProperties.getBase64EncodedSecretKey(), jwtTokenManagerProperties.getTtl(), claims);
         LoginVo loginVO = new LoginVo();

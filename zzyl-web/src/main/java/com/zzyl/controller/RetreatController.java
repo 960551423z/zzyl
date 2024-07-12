@@ -21,12 +21,12 @@ public class RetreatController {
     @Autowired
     private RetreatService retreatService;
 
-    @PostMapping("/create")
-    @ApiOperation(value = "申请退住", notes = "传入退住对象")
-    public ResponseResult createRetreat(
-            @RequestBody @ApiParam(value = "退住对象", required = true) Retreat retreatDto) {
-        return retreatService.createRetreat(retreatDto);
-    }
+//    @PostMapping("/create")
+//    @ApiOperation(value = "申请退住", notes = "传入退住对象")
+//    public ResponseResult createRetreat(
+//            @RequestBody @ApiParam(value = "退住对象", required = true) Retreat retreatDto) {
+//        return retreatService.createRetreat(retreatDto);
+//    }
 
     @GetMapping
     @ApiOperation(value = "退住表单查询")

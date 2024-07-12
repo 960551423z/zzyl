@@ -2,6 +2,7 @@ package com.zzyl.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 @Data
 @NoArgsConstructor
+//@Builder
 public class BaseDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -51,6 +53,8 @@ public class BaseDto implements Serializable {
     public void setParams(Map<String, Object> params) {
         this.params = params;
     }
+
+
 
 }
 

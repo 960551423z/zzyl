@@ -36,12 +36,12 @@ public class CheckInController {
     private CheckInConfigService checkInConfigService;
 
 
-    @PostMapping("/create")
-    @ApiOperation(value = "申请入住", notes = "传入入住对象")
-    public ResponseResult<CheckInVo> createCheckIn(
-            @RequestBody @ApiParam(value = "入住对象", required = true) CheckInDto checkInDto) {
-        return checkInService.createCheckIn(checkInDto);
-    }
+//    @PostMapping("/create")
+//    @ApiOperation(value = "申请入住", notes = "传入入住对象")
+//    public ResponseResult<CheckInVo> createCheckIn(
+//            @RequestBody @ApiParam(value = "入住对象", required = true) CheckInDto checkInDto) {
+//        return checkInService.createCheckIn(checkInDto);
+//    }
 
     @PostMapping("/review")
     @ApiOperation(value = "评估", notes = "传入入住对象")

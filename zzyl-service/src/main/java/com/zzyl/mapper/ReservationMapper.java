@@ -29,9 +29,15 @@ public interface ReservationMapper {
 
     List<TimeCountVo> countReservationsForEachTimeWithinTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
-    int countCancelledReservationsWithinTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("updateBy") Long updateBy);
+    //    int countCancelledReservationsWithinTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("updateBy") Long updateBy);
+    int countCancelledReservationsWithinTimeRange(LocalDateTime startTime, LocalDateTime endTime, Long updateBy);
 
+    /**
+     * 当前时间大于数据库中存储的预约时间，那我就执行这个
+     * @param minusDays 当前时间
+     */
     @Update("update reservation set status = 3 where status = 0 and time <= #{minusDays}")
     void updateReservationStatus(LocalDateTime minusDays);
 
+    Page<Reservation> page(Integer pageNum, Integer pageSize, Integer status, Long userId);
 }

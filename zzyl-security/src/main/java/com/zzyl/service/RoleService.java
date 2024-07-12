@@ -18,7 +18,7 @@ public interface RoleService {
      * @param pageSize 每页条数
      * @return Page<ResourceVo>
      */
-    PageResponse<RoleVo> findRolePage(RoleDto roleDto, int pageNum, int pageSize);
+//    PageResponse<RoleVo> findRolePage(RoleDto roleDto, int pageNum, int pageSize);
 
     /**
      *  创建角色表

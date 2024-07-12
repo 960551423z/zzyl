@@ -34,12 +34,39 @@
         , parent_dept_no, dept_no, dept_name, sort_no, data_state, create_time, update_time,
     create_by, update_by, remark, leader_id
     </sql>
+
+
+
+
+    <select id="getList" resultMap="BaseResultVoMap">
+        select
+        d.id, d.parent_dept_no, d.dept_no, d.dept_name, d.sort_no, d.data_state, d.create_time, d.update_time,
+        d.create_by, d.update_by, d.remark, d.leader_id
+        , u.real_name as leaderName,DATE_FORMAT(d.create_time,'%Y-%m-%d') as create_day
+        from sys_dept d
+        left join sys_user u on u.id = leader_id
+        <where>
+            <if test="deptName!=null and deptName!=''">
+                and d.dept_name like concat('%',#{deptName},'%')
+            </if>
+            <if test="parentDeptNo!=null and parentDeptNo!=''">
+                and d.parent_dept_no like concat(#{parentDeptNo},'%')
+            </if>
+            <if test="dataState!=null and dataState!=''">
+                and d.data_state=#{dataState}
+            </if>
+        </where>
+        order by d.sort_no , d.create_time desc
+    </select>
+
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from sys_dept
         where id = #{id,jdbcType=BIGINT}
     </select>
+
     <select id="selectList" parameterType="com.zzyl.dto.DeptDto" resultMap="BaseResultMap">
         select
         d.id, d.parent_dept_no, d.dept_no, d.dept_name, d.sort_no, d.data_state, d.create_time, d.update_time,
@@ -66,6 +93,7 @@
         </where>
         order by d.sort_no asc, d.create_time desc
     </select>
+
     <select id="findDeptInDeptNos" parameterType="java.util.List" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -88,13 +116,13 @@
             #{roleId}
         </foreach>)
     </select>
-    <select id="selectByDeptNo" resultType="com.zzyl.entity.Dept">
-        select
-        <include refid="Base_Column_List"/>
-        from sys_dept
-        where dept_no = #{deptNo,jdbcType=VARCHAR}
+    <!--<select id="selectByDept" resultType="com.zzyl.entity.Dept">-->
+    <!--    select-->
+    <!--    <include refid="Base_Column_List"/>-->
+    <!--    from sys_dept-->
+    <!--    where dept_no = #{deptNo,jdbcType=VARCHAR}-->
 
-    </select>
+    <!--</select>-->
 
     <select id="hasChildByDeptId" parameterType="java.lang.String" resultType="int">
         select count(1)
@@ -113,15 +141,38 @@
         where dept_no = #{deptId}
     </delete>
 
+    <!--删除部门-->
+    <delete id="delete">
+        delete from sys_dept where id = #{deptId};
+    </delete>
+
+
     <select id="selectChildrenDeptById" parameterType="java.lang.String" resultMap="BaseResultVoMap">
         select *
         from sys_dept
         where find_in_set(#{deptId}, ancestors)
     </select>
-    <insert id="insert" parameterType="com.zzyl.entity.Dept">
-        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
+
+    <!--茶轩是否还存在子节点-->
+    <select id="selectNode" resultType="com.zzyl.entity.Dept">
+        select * from sys_dept
+        where parent_dept_no = #{deptNo} and data_state = 0;
+    </select>
+
+    <!--根据 部门 id 批量查询-->
+    <select id="selectByBatchDeptNos" resultType="com.zzyl.entity.Dept">
+            select * from sys_dept
+            where dept_no in 
+            <foreach collection="deptNos" item="deptNo" open="(" separator="," close=")" >
+                #{deptNo}
+            </foreach>
+    </select>
+
+
+    <insert id="insert" parameterType="com.zzyl.entity.Dept" useGeneratedKeys="true" keyProperty="id">
+        <!--<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">-->
+        <!--    SELECT LAST_INSERT_ID()-->
+        <!--</selectKey>-->
         insert into sys_dept
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="parentDeptNo != null">
@@ -188,7 +239,9 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zzyl.entity.Dept">
+
+
+    <update id="update" parameterType="com.zzyl.entity.Dept">
         update sys_dept
         <set>
             <if test="parentDeptNo != null">
@@ -220,6 +273,9 @@
             </if>
             <if test="leaderId != null">
                 leader_id = #{leaderId,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark}
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}

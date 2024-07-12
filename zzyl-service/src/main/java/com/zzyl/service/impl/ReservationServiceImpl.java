@@ -50,30 +50,21 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     public void add(ReservationDto dto) {
-        if (dto.getType().equals(1)) {
-            ElderVo elderVo = elderService.selectByPrimaryKey(dto.getElderId());
-            if (elderVo.getStatus() == 3) {
-                throw new BaseException("退住中，不可预约");
-            }
-            if (elderVo.getStatus() == 5) {
-                throw new BaseException("已退住，不可预约");
-            }
-        }
+
+        // 取消找过三次不能预约
+        Reservation reservation = BeanUtil.copyProperties(dto, Reservation.class);
+
+        // 查询预约次数
         Long userId = UserThreadLocal.getUserId();
-
-        // 取消次数大于3次的也不能预约
-        int cancelledReservationCount = getCancelledReservationCount(userId);
-
-        // 如果已经预约的次数超过3次，则不需要再进行预约
-        if (cancelledReservationCount >= 3) {
+        int count = getCancelledReservationCount(userId);
+        if (count >= 3)
             throw new BaseException("今天取消次数已达上限，不可进行预约");
-        }
 
-        // 否则，允许添加预约
-        Reservation reservation = new Reservation();
-        BeanUtils.copyProperties(dto, reservation);
+
         reservation.setStatus(ReservationStatus.PENDING.getOrdinal());
         reservation.setCreateBy(userId);
+
+        // 预约过了，数据库设置了时间的唯一性
         try {
             reservationMapper.insert(reservation);
         }
@@ -81,6 +72,57 @@ public class ReservationServiceImpl implements ReservationService {
             log.info(e +"");
             throw new BaseException("此手机号已预约该时间");
         }
+
+    }
+
+
+    /**
+     * 获取取消预约次数
+     * @param updateBy 更新人id
+     * @return 取消预约次数
+     */
+    @Override
+    public int getCancelledReservationCount(Long updateBy) {
+
+        // 取消预约次数（一天时间内，所以是从00:00:00 - 23:59:59）
+        return reservationMapper.countCancelledReservationsWithinTimeRange(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0),
+                LocalDateTime.now().withHour(23).withMinute(59).withSecond(59), updateBy);
+    }
+
+
+    /**
+     * 查询每个时间段剩余预约次数
+     * @param time 时间 日
+     * @return 每个时间段剩余预约次数
+     */
+    @Override
+    public List<TimeCountVo> countReservationsForEachTimeWithinTimeRange(LocalDateTime time) {
+
+        // 查询的这个时间段往后推24小时，假如是今天则向后推24小时，明天也往后推24小时或者
+//        LocalDateTime endTime = time.plusHours(24);
+        LocalDateTime endTime = time.withHour(23).withMinute(59).withSecond(59);
+        return reservationMapper.countReservationsForEachTimeWithinTimeRange(time, endTime);
+    }
+
+
+    /**
+     * 分页查询
+     * @param pageNum
+     * @param pageSize
+     * @param status
+     * @return
+     */
+    @Override
+    public PageResponse<ReservationVo> page(Integer pageNum, Integer pageSize, Integer status) {
+
+        PageHelper.startPage(pageNum,pageSize);
+
+        // 当前登录人
+        Long userId = UserThreadLocal.getUserId();
+
+
+        Page<Reservation> pages = reservationMapper.page(pageNum,pageSize,status,userId);
+        return PageResponse.of(pages,ReservationVo.class);
     }
 
     /**
@@ -205,27 +247,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    /**
-     * 查询每个时间段剩余预约次数
-     * @param time 时间 日
-     * @return 每个时间段剩余预约次数
-     */
-    @Override
-    public List<TimeCountVo> countReservationsForEachTimeWithinTimeRange(LocalDateTime time) {
-        LocalDateTime endTime = time.plusHours(24);
-        return reservationMapper.countReservationsForEachTimeWithinTimeRange(time, endTime);
-    }
 
-    /**
-     * 获取取消预约次数
-     * @param updateBy 更新人id
-     * @return 取消预约次数
-     */
-    @Override
-    public int getCancelledReservationCount(Long updateBy) {
-        return reservationMapper.countCancelledReservationsWithinTimeRange(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0),
-                LocalDateTime.now().withHour(23).withMinute(59).withSecond(59), updateBy);
-    }
 
     /**
      * 来访
@@ -246,6 +268,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public void updateReservationStatus(LocalDateTime now) {
+
         reservationMapper.updateReservationStatus(now);
     }
 }

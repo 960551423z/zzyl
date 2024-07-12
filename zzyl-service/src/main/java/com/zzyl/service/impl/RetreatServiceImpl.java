@@ -69,121 +69,121 @@ public class RetreatServiceImpl implements RetreatService {
     @Autowired
     private AccraditationRecordService accraditationRecordService;
 
-    /**
-     * 退住申请
-     * @param retreat
-     */
-    @Override
-    @Transactional
-    public ResponseResult createRetreat(Retreat retreat) {
-
-        //1.验证状态
-        Long elderId = retreat.getElderId();
-        Retreat dbRetreat = retreatMapper.selectByElderId(elderId);
-        if (dbRetreat != null && retreat.getFlowStatus() == null) {
-            return ResponseResult.error(dbRetreat.getName() + "已经发起了申请退住");
-        }
-
-        if (ObjectUtil.isNotEmpty(retreat.getTaskId())) {
-            // 修改
-            Retreat oldRetreat = retreatMapper.selectByCode(retreat.getRetreatCode());
-            if (!oldRetreat.getElderId().equals(retreat.getElderId())) {
-                Elder elder = new Elder();
-                elder.setId(retreat.getElderId());
-                elder.setStatus(1);
-                elderMapper.updateByPrimaryKeySelective(elder);
-            }
-        }
-
-        //是否在入住期限内
-        CheckInConfig currentConfigByElderId = checkInConfigService.findCurrentConfigByElderId(retreat.getElderId());
-        if (currentConfigByElderId.getCostStartTime().isAfter(retreat.getCheckOutTime()) || currentConfigByElderId.getCostEndTime().isBefore(retreat.getCheckOutTime())) {
-            return ResponseResult.error("请在费用期限内发起退住申请");
-        }
-
-        Bill bill = billMapper.selectFirstByElder(elderId);
-        // 账单开始结束时间
-        int year = Integer.parseInt(bill.getBillMonth().substring(0, 4));
-        int monthOfYear = Integer.parseInt(bill.getBillMonth().substring(5, 7));
-        LocalDateTime firstDayOfMonth = LocalDateTime.of(year, monthOfYear, 1, 0, 0, 0);
-        while (firstDayOfMonth.plusMonths(1).isBefore(retreat.getCheckOutTime())) {
-            // 生成首月账单
-            BillDto billDto = new BillDto();
-            billDto.setElderId(elderId);
-            String format = LocalDateTimeUtil.format(firstDayOfMonth.plusMonths(1), "yyyy-MM");
-            billDto.setBillMonth(format);
-            try {
-                billService.createMonthBill(billDto);
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-            firstDayOfMonth = firstDayOfMonth.plusMonths(1);
-        }
-
-        // 关闭不在账单周期内 并且未支付的账单
-        billMapper.delete(elderId, retreat.getCheckOutTime());
-        //从当前线程中获取用户数据
-        String subject = UserThreadLocal.getSubject();
-        User user = JSON.parseObject(subject, User.class);
-        //申请人部门编号
-        String deptNo = user.getDeptNo();
-
-        //退住标题
-        String title = retreat.getName() + "的退住申请";
-        //设置流程状态
-        retreat.setFlowStatus(Retreat.FlowStatus.APPLY_APPROVAL.getCode());
-        retreat.setStatus(Retreat.Status.APPLICATION.getCode());
-        if (retreat.getRetreatCode() != null) {
-            if (!user.getId().equals(retreat.getApplicatId())) {
-                return ResponseResult.error("不是申请人，不是能提交数据");
-            }
-            //申请人的名字
-            retreat.setTitle(title);
-            //修改
-            retreatMapper.update(retreat);
-
-        } else {
-            retreat.setApplicat(user.getRealName());
-            retreat.setApplicatId(user.getId());
-            //创建时间
-            retreat.setCreateTime(LocalDateTime.now());
-            retreat.setTitle(title);
-            retreat.setCreateBy(user.getId());//创建人
-            retreat.setStatus(Retreat.Status.APPLICATION.getCode());
-            //设置下个操作人
-            String retreatCode = CodeUtil.generateCode(RETREAT_CODE_PREFIX, redisTemplate, 5);
-            retreat.setRetreatCode(retreatCode);
-            retreat.setDeptNo(deptNo);
-            //设置下一个状态
-            retreatMapper.createRetreat(retreat);
-
-            //修改老人状态为退住中....
-            Elder elder = new Elder();
-            elder.setId(retreat.getElderId());
-            elder.setStatus(3);
-            elderMapper.updateByPrimaryKeySelective(elder);
-        }
-        if (ObjectUtil.isNotEmpty(retreat.getTaskId())) {
-            actFlowCommService.completeProcess(retreat.getTitle(), retreat.getTaskId(), user.getId().toString(), 1, retreat.getStatus());
-        }else {
-            Map<String, Object> setvariables = setvariables(retreat.getRetreatCode());
-            actFlowCommService.start(retreat.getId(), "retreat", user, setvariables, true);
-        }
-        //保存审核（操作）记录
-        Long nextAssignee = actFlowCommService.getNextAssignee("retreat", "retreat:" + retreat.getId());
-        RecoreVo recoreVo = getRecoreVo(
-                retreat,
-                user,
-                AccraditationRecordConstant.AUDIT_STATUS_PASS,
-                "",
-                "发起申请-申请退住",
-                "护理组长审批-申请审批",
-                nextAssignee,
-                AccraditationRecordConstant.RECORD_HANDLE_TYPE_PROCESSED);
-        accraditationRecordService.insert(recoreVo);
-
-        return ResponseResult.success("提交成功");
-    }
+//    /**
+//     * 退住申请
+//     * @param retreat
+//     */
+//    @Override
+//    @Transactional
+//    public ResponseResult createRetreat(Retreat retreat) {
+//
+//        //1.验证状态
+//        Long elderId = retreat.getElderId();
+//        Retreat dbRetreat = retreatMapper.selectByElderId(elderId);
+//        if (dbRetreat != null && retreat.getFlowStatus() == null) {
+//            return ResponseResult.error(dbRetreat.getName() + "已经发起了申请退住");
+//        }
+//
+//        if (ObjectUtil.isNotEmpty(retreat.getTaskId())) {
+//            // 修改
+//            Retreat oldRetreat = retreatMapper.selectByCode(retreat.getRetreatCode());
+//            if (!oldRetreat.getElderId().equals(retreat.getElderId())) {
+//                Elder elder = new Elder();
+//                elder.setId(retreat.getElderId());
+//                elder.setStatus(1);
+//                elderMapper.updateByPrimaryKeySelective(elder);
+//            }
+//        }
+//
+//        //是否在入住期限内
+//        CheckInConfig currentConfigByElderId = checkInConfigService.findCurrentConfigByElderId(retreat.getElderId());
+//        if (currentConfigByElderId.getCostStartTime().isAfter(retreat.getCheckOutTime()) || currentConfigByElderId.getCostEndTime().isBefore(retreat.getCheckOutTime())) {
+//            return ResponseResult.error("请在费用期限内发起退住申请");
+//        }
+//
+//        Bill bill = billMapper.selectFirstByElder(elderId);
+//        // 账单开始结束时间
+//        int year = Integer.parseInt(bill.getBillMonth().substring(0, 4));
+//        int monthOfYear = Integer.parseInt(bill.getBillMonth().substring(5, 7));
+//        LocalDateTime firstDayOfMonth = LocalDateTime.of(year, monthOfYear, 1, 0, 0, 0);
+//        while (firstDayOfMonth.plusMonths(1).isBefore(retreat.getCheckOutTime())) {
+//            // 生成首月账单
+//            BillDto billDto = new BillDto();
+//            billDto.setElderId(elderId);
+//            String format = LocalDateTimeUtil.format(firstDayOfMonth.plusMonths(1), "yyyy-MM");
+//            billDto.setBillMonth(format);
+//            try {
+//                billService.createMonthBill(billDto);
+//            }catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            firstDayOfMonth = firstDayOfMonth.plusMonths(1);
+//        }
+//
+//        // 关闭不在账单周期内 并且未支付的账单
+//        billMapper.delete(elderId, retreat.getCheckOutTime());
+//        //从当前线程中获取用户数据
+//        String subject = UserThreadLocal.getSubject();
+//        User user = JSON.parseObject(subject, User.class);
+//        //申请人部门编号
+//        String deptNo = user.getDeptNo();
+//
+//        //退住标题
+//        String title = retreat.getName() + "的退住申请";
+//        //设置流程状态
+//        retreat.setFlowStatus(Retreat.FlowStatus.APPLY_APPROVAL.getCode());
+//        retreat.setStatus(Retreat.Status.APPLICATION.getCode());
+//        if (retreat.getRetreatCode() != null) {
+//            if (!user.getId().equals(retreat.getApplicatId())) {
+//                return ResponseResult.error("不是申请人，不是能提交数据");
+//            }
+//            //申请人的名字
+//            retreat.setTitle(title);
+//            //修改
+//            retreatMapper.update(retreat);
+//
+//        } else {
+//            retreat.setApplicat(user.getRealName());
+//            retreat.setApplicatId(user.getId());
+//            //创建时间
+//            retreat.setCreateTime(LocalDateTime.now());
+//            retreat.setTitle(title);
+//            retreat.setCreateBy(user.getId());//创建人
+//            retreat.setStatus(Retreat.Status.APPLICATION.getCode());
+//            //设置下个操作人
+//            String retreatCode = CodeUtil.generateCode(RETREAT_CODE_PREFIX, redisTemplate, 5);
+//            retreat.setRetreatCode(retreatCode);
+//            retreat.setDeptNo(deptNo);
+//            //设置下一个状态
+//            retreatMapper.createRetreat(retreat);
+//
+//            //修改老人状态为退住中....
+//            Elder elder = new Elder();
+//            elder.setId(retreat.getElderId());
+//            elder.setStatus(3);
+//            elderMapper.updateByPrimaryKeySelective(elder);
+//        }
+//        if (ObjectUtil.isNotEmpty(retreat.getTaskId())) {
+//            actFlowCommService.completeProcess(retreat.getTitle(), retreat.getTaskId(), user.getId().toString(), 1, retreat.getStatus());
+//        }else {
+//            Map<String, Object> setvariables = setvariables(retreat.getRetreatCode());
+//            actFlowCommService.start(retreat.getId(), "retreat", user, setvariables, true);
+//        }
+//        //保存审核（操作）记录
+//        Long nextAssignee = actFlowCommService.getNextAssignee("retreat", "retreat:" + retreat.getId());
+//        RecoreVo recoreVo = getRecoreVo(
+//                retreat,
+//                user,
+//                AccraditationRecordConstant.AUDIT_STATUS_PASS,
+//                "",
+//                "发起申请-申请退住",
+//                "护理组长审批-申请审批",
+//                nextAssignee,
+//                AccraditationRecordConstant.RECORD_HANDLE_TYPE_PROCESSED);
+//        accraditationRecordService.insert(recoreVo);
+//
+//        return ResponseResult.success("提交成功");
+//    }
 
     /**
      * 获取操作记录数据
@@ -225,57 +225,57 @@ public class RetreatServiceImpl implements RetreatService {
     @Autowired
     private RetreatBillMapper retreatBillMapper;
 
-    public Map<String, Object> setvariables(String id) {
-        //设置流程变量
-        Map<String,Object> variables = new HashMap<>();
-
-        // 护理员
-        Retreat retreat = retreatMapper.getRetreatByCode(id);
-        Long applicatId = retreat.getApplicatId();
-        variables.put("assignee0", applicatId);
-
-        variables.put("assignee0Name", retreat.getApplicat());
-        variables.put("processTitle", retreat.getTitle());
-
-        // 护理部部门编号
-        Dept dept = deptMapper.selectByDeptNo(RetreatConstant.NURSING_DEPT_CODE);
-        //部门领导id
-        Long leaderId = dept.getLeaderId();
-        variables.put("assignee1",leaderId);
-
-        // 法务员工
-        //设置下一个审核人
-        //找到法务部门编号--->通过编号查询法务中所有的员工（非leader）---->获取第一个人，找到这个人的id,然后查询对应的角色
-        List<Long> legatUserIds = userMapper.selectByDeptNo(RetreatConstant.LEGAL_DEPT_CODE);
-        variables.put("assignee2",legatUserIds.get(legatUserIds.size() - 1));
-
-        // 结算员
-        List<Long> jsUserIds = userMapper.selectByDeptNo(RetreatConstant.SETTLEMENT_DEPT_CODE);
-        variables.put("assignee3",jsUserIds.get(jsUserIds.size() - 1));
-
-        // 结算组长
-        Dept jsDept = deptMapper.selectByDeptNo(RetreatConstant.SETTLEMENT_DEPT_CODE);
-        //部门领导id
-        Long jsLeaderId = jsDept.getLeaderId();
-        variables.put("assignee4", jsLeaderId);
-
-        // 副院长
-        List<Long> fyzUserIdList = userMapper.selectByDeptNo(RetreatConstant.DEAN_OFFICE_DEPT_CODE);
-        variables.put("assignee5", fyzUserIdList.get(0));
-
-        // 结算员
-        variables.put("assignee6", jsUserIds.get(jsUserIds.size() - 1));
-
-        // 流程类型
-        variables.put("processType", 1);
-
-        // 流程类型
-        variables.put("processCode", retreat.getRetreatCode());
-
-        // 流程类型
-        variables.put("processStatus", 1);
-        return variables;
-    }
+//    public Map<String, Object> setvariables(String id) {
+//        //设置流程变量
+//        Map<String,Object> variables = new HashMap<>();
+//
+//        // 护理员
+//        Retreat retreat = retreatMapper.getRetreatByCode(id);
+//        Long applicatId = retreat.getApplicatId();
+//        variables.put("assignee0", applicatId);
+//
+//        variables.put("assignee0Name", retreat.getApplicat());
+//        variables.put("processTitle", retreat.getTitle());
+//
+//        // 护理部部门编号
+//        Dept dept = deptMapper.selectByDeptNo(RetreatConstant.NURSING_DEPT_CODE);
+//        //部门领导id
+//        Long leaderId = dept.getLeaderId();
+//        variables.put("assignee1",leaderId);
+//
+//        // 法务员工
+//        //设置下一个审核人
+//        //找到法务部门编号--->通过编号查询法务中所有的员工（非leader）---->获取第一个人，找到这个人的id,然后查询对应的角色
+//        List<Long> legatUserIds = userMapper.selectByDeptNo(RetreatConstant.LEGAL_DEPT_CODE);
+//        variables.put("assignee2",legatUserIds.get(legatUserIds.size() - 1));
+//
+//        // 结算员
+//        List<Long> jsUserIds = userMapper.selectByDeptNo(RetreatConstant.SETTLEMENT_DEPT_CODE);
+//        variables.put("assignee3",jsUserIds.get(jsUserIds.size() - 1));
+//
+//        // 结算组长
+//        Dept jsDept = deptMapper.selectByDeptNo(RetreatConstant.SETTLEMENT_DEPT_CODE);
+//        //部门领导id
+//        Long jsLeaderId = jsDept.getLeaderId();
+//        variables.put("assignee4", jsLeaderId);
+//
+//        // 副院长
+//        List<Long> fyzUserIdList = userMapper.selectByDeptNo(RetreatConstant.DEAN_OFFICE_DEPT_CODE);
+//        variables.put("assignee5", fyzUserIdList.get(0));
+//
+//        // 结算员
+//        variables.put("assignee6", jsUserIds.get(jsUserIds.size() - 1));
+//
+//        // 流程类型
+//        variables.put("processType", 1);
+//
+//        // 流程类型
+//        variables.put("processCode", retreat.getRetreatCode());
+//
+//        // 流程类型
+//        variables.put("processStatus", 1);
+//        return variables;
+//    }
 
     /**
      * 查询退住信息

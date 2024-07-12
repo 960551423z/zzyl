@@ -74,7 +74,7 @@ public interface ReservationService {
      * @param of 时间 日
      * @return 每个时间段剩余预约次数
      */
-    public List<TimeCountVo> countReservationsForEachTimeWithinTimeRange(LocalDateTime of);
+    List<TimeCountVo> countReservationsForEachTimeWithinTimeRange(LocalDateTime of);
 
     /**
      * 取消预约次数的接口
@@ -90,5 +90,18 @@ public interface ReservationService {
      */
     void visit(Long id, Long time);
 
+
+    /**
+     * 定时任务，预约状态修改，每小时的1分，31分检测
+     * @param now
+     */
     void updateReservationStatus(LocalDateTime now);
+
+    /**
+     * 分页条件查询
+     * @param pageNum
+     * @param pageSize
+     * @param status
+     */
+    PageResponse<ReservationVo> page(Integer pageNum, Integer pageSize, Integer status);
 }

@@ -15,7 +15,7 @@ public class UserThreadLocal {
     /***
      *  创建线程局部userVO变量
      */
-    public static ThreadLocal<String> subjectThreadLocal = new ThreadLocal<String>() {
+    public static ThreadLocal<String> subjectThreadLocal = new ThreadLocal<>() {
         @Override
         protected String initialValue() {
             return null;
