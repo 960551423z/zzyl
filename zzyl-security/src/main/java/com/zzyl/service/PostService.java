@@ -4,6 +4,8 @@ import com.zzyl.base.PageResponse;
 import com.zzyl.dto.PostDto;
 import com.zzyl.vo.PostVo;
 
+import java.util.List;
+
 /**
  * 岗位表服务类
  */
@@ -53,12 +55,12 @@ public interface PostService {
 //     */
 //    Boolean updatePost(PostDto postDto);
 //
-//    /**
-//     *  多条件查询岗位表列表
-//     * @param postDto 查询条件
-//     * @return: List<PostDto>
-//     */
-//    List<PostVo> findPostList(PostDto postDto);
+    /**
+     *  多条件查询岗位表列表
+     * @param postDto 查询条件
+     * @return: List<PostDto>
+     */
+    List<PostVo> findPostList(PostDto postDto);
 //
 //    /**
 //     *  人员对应职位

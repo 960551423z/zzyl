@@ -90,6 +90,7 @@ zzyl:
       base64-encoded-secret-key: $2a$10$PVtHnkj86mJgf6li/yron.LRx/cQAlaiZkBJ9BeogCNTryXJRT1YC
       ttl: 3600000
 
+
 management:
   health:
     rabbit:

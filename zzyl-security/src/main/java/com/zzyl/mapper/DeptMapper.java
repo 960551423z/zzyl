@@ -52,4 +52,10 @@ public interface DeptMapper {
      * 根据部门id批量查询
      */
     List<Dept> selectByBatchDeptNos(@Param("deptNos") List<String> deptNos);
+
+
+    List<DeptVo> findDeptVoListInRoleId(@Param("roleIds") List<Long> roleIdSet);
+
+
+    List<Dept> findDeptInDeptNos(@Param("deptNos") List<String> deptNos);
 }

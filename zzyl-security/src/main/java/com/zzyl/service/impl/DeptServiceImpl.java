@@ -10,6 +10,7 @@ import com.zzyl.entity.Dept;
 import com.zzyl.exception.BaseException;
 import com.zzyl.mapper.DeptMapper;
 import com.zzyl.service.DeptService;
+import com.zzyl.utils.BeanConv;
 import com.zzyl.utils.NoProcessing;
 import com.zzyl.vo.DeptVo;
 import com.zzyl.vo.TreeItemVo;
@@ -323,12 +324,12 @@ public class DeptServiceImpl implements DeptService {
 //        return deptVos;
 //    }
 //
-//
-//    @Override
-//    public List<DeptVo> findDeptInDeptNos(List<String> deptNos) {
-//        List<Dept> depts = deptMapper.findDeptInDeptNos(deptNos);
-//        return BeanConv.toBeanList(depts, DeptVo.class);
-//    }
+
+    @Override
+    public List<DeptVo> findDeptInDeptNos(List<String> deptNos) {
+        List<Dept> depts = deptMapper.findDeptInDeptNos(deptNos);
+        return BeanConv.toBeanList(depts, DeptVo.class);
+    }
 //
 //
 //    @Override
@@ -352,10 +353,10 @@ public class DeptServiceImpl implements DeptService {
 //        }
 //    }
 //
-//    @Override
-//    public List<DeptVo> findDeptVoListInRoleId(List<Long> roleIdSet) {
-//        return deptMapper.findDeptVoListInRoleId(roleIdSet);
-//    }
+    @Override
+    public List<DeptVo> findDeptVoListInRoleId(List<Long> roleIdSet) {
+        return deptMapper.findDeptVoListInRoleId(roleIdSet);
+    }
 //
 //    @Transactional
 //    @Caching(evict = {@CacheEvict(value = DeptCacheConstant.LIST,allEntries = true),

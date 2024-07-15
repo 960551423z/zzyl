@@ -145,19 +145,19 @@ public class PostController {
 //        return ResponseResult.success(postService.deletePostByIds(postIds));
 //    }
 //
-//    /***
-//     *  多条件查询岗位列表
-//     * @param postDto 岗位DTO对象
-//     * @return List<PostVo>
-//     */
-//    @PostMapping("list")
-//    @ApiOperation(value = "岗位列表",notes = "岗位列表")
-//    @ApiImplicitParam(name = "postDto",value = "岗位DTO对象",required = true,dataType = "PostDto")
-//    @ApiOperationSupport(includeParameters = {"postDto.deptNo"})
-//    public ResponseResult<List<PostVo>> postList(@RequestBody PostDto postDto) {
-//        List<PostVo> postVoList = postService.findPostList(postDto);
-//        return ResponseResult.success(postVoList);
-//    }
+    /***
+     *  多条件查询岗位列表
+     * @param postDto 岗位DTO对象
+     * @return List<PostVo>
+     */
+    @PostMapping("list")
+    @ApiOperation(value = "岗位列表",notes = "岗位列表")
+    @ApiImplicitParam(name = "postDto",value = "岗位DTO对象",required = true,dataType = "PostDto")
+    @ApiOperationSupport(includeParameters = {"postDto.deptNo"})
+    public ResponseResult<List<PostVo>> postList(@RequestBody PostDto postDto) {
+        List<PostVo> postVoList = postService.findPostList(postDto);
+        return ResponseResult.success(postVoList);
+    }
 
 
 }

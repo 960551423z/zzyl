@@ -23,34 +23,34 @@ import java.util.List;
 @Slf4j
 @Api(tags = "角色管理")
 @RestController
-@RequestMapping("role")
+@RequestMapping("/role")
 public class RoleController {
 
     @Autowired
     RoleService roleService;
 
-//    /***
-//     *  多条件查询角色分页列表
-//     * @param roleDto 角色DTO查询条件
-//     * @param pageNum 页码
-//     * @param pageSize 每页条数
-//     * @return: Page<RoleVo>
-//     */
-//    @PostMapping("page/{pageNum}/{pageSize}")
-//    @ApiOperation(value = "角色分页",notes = "角色分页")
-//    @ApiImplicitParams({
-//        @ApiImplicitParam(name = "roleDto",value = "角色DTO对象",required = true,dataType = "roleDto"),
-//        @ApiImplicitParam(paramType = "path",name = "pageNum",value = "页码",example = "1",dataType = "Integer"),
-//        @ApiImplicitParam(paramType = "path",name = "pageSize",value = "每页条数",example = "10",dataType = "Integer")
-//    })
-//    @ApiOperationSupport(includeParameters = {"roleDto.roleName"})
-//    public ResponseResult<PageResponse<RoleVo>> findRoleVoPage(
-//                                    @RequestBody RoleDto roleDto,
-//                                    @PathVariable("pageNum") int pageNum,
-//                                    @PathVariable("pageSize") int pageSize) {
-//        PageResponse<RoleVo> roleVoPage = roleService.findRolePage(roleDto, pageNum, pageSize);
-//        return ResponseResult.success(roleVoPage);
-//    }
+    /***
+     *  多条件查询角色分页列表
+     * @param roleDto 角色DTO查询条件
+     * @param pageNum 页码
+     * @param pageSize 每页条数
+     * @return: Page<RoleVo>
+     */
+    @PostMapping("/page/{pageNum}/{pageSize}")
+    @ApiOperation(value = "角色分页",notes = "角色分页")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "roleDto",value = "角色DTO对象",required = true,dataType = "roleDto"),
+        @ApiImplicitParam(paramType = "path",name = "pageNum",value = "页码",example = "1",dataType = "Integer"),
+        @ApiImplicitParam(paramType = "path",name = "pageSize",value = "每页条数",example = "10",dataType = "Integer")
+    })
+    @ApiOperationSupport(includeParameters = {"roleDto.roleName"})
+    public ResponseResult<PageResponse<RoleVo>> findRoleVoPage(
+                                    @RequestBody RoleDto roleDto,
+                                    @PathVariable("pageNum") int pageNum,
+                                    @PathVariable("pageSize") int pageSize) {
+        PageResponse<RoleVo> roleVoPage = roleService.findRolePage(roleDto, pageNum, pageSize);
+        return ResponseResult.success(roleVoPage);
+    }
 
     /**
      *  保存角色

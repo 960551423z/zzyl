@@ -71,12 +71,12 @@ public interface DeptService {
 
 //
 //
-//    /**
-//     *  批量查詢部門
-//     * @param deptNos 查询条件
-//     * @return: TreeVo
-//     */
-//    List<DeptVo> findDeptInDeptNos(List<String> deptNos);
+    /**
+     *  批量查詢部門
+     * @param deptNos 查询条件
+     * @return: TreeVo
+     */
+    List<DeptVo> findDeptInDeptNos(List<String> deptNos);
 //
 //    /**
 //     *  创建编号
@@ -85,12 +85,12 @@ public interface DeptService {
 //     */
 //    String createDeptNo(String parentDeptNo);
 //
-//    /***
-//     *  角色对应部门
-//     * @param roleIds
-//     * @return
-//     */
-//    List<DeptVo> findDeptVoListInRoleId(List<Long> roleIds);
+    /***
+     *  角色对应部门
+     * @param roleIds
+     * @return
+     */
+    List<DeptVo> findDeptVoListInRoleId(List<Long> roleIds);
 //
 //    /**
 //     * 根据部门ID删除部门

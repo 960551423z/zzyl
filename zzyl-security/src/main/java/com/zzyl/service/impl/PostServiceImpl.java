@@ -14,6 +14,7 @@ import com.zzyl.mapper.PostMapper;
 import com.zzyl.mapper.UserMapper;
 import com.zzyl.service.DeptService;
 import com.zzyl.service.PostService;
+import com.zzyl.utils.BeanConv;
 import com.zzyl.utils.EmptyUtil;
 import com.zzyl.utils.NoProcessing;
 import com.zzyl.vo.DeptVo;
@@ -225,28 +226,28 @@ public class PostServiceImpl implements PostService {
 //        return true;
 //    }
 //
-//    @Override
-//    public List<PostVo> findPostList(PostDto postDto) {
-//
-//        postDto.setDataState("0");
-//        List<Post> postList = postMapper.selectList(postDto);
-//        List<PostVo> postVoList = BeanConv.toBeanList(postList, PostVo.class);
-//        if (!EmptyUtil.isNullOrEmpty(postVoList)){
-//            //对应部门
-//            List<String> deptNos = postVoList.stream().map(PostVo::getDeptNo).collect(Collectors.toList());
-//            List<DeptVo> deptVoList = deptService.findDeptInDeptNos(deptNos);
-//            postVoList.forEach(n->{
-//                //装配部门
-//                deptVoList.forEach(d->{
-//                    if (n.getDeptNo().equals(d.getDeptNo())){
-//                        n.setDeptVo(BeanConv.toBean(d,DeptVo.class));
-//                    }
-//                });
-//
-//            });
-//        }
-//        return postVoList;
-//    }
+    @Override
+    public List<PostVo> findPostList(PostDto postDto) {
+
+        postDto.setDataState("0");
+        List<Post> postList = postMapper.selectList(postDto);
+        List<PostVo> postVoList = BeanConv.toBeanList(postList, PostVo.class);
+        if (!EmptyUtil.isNullOrEmpty(postVoList)){
+            //对应部门
+            List<String> deptNos = postVoList.stream().map(PostVo::getDeptNo).collect(Collectors.toList());
+            List<DeptVo> deptVoList = deptService.findDeptInDeptNos(deptNos);
+            postVoList.forEach(n->{
+                //装配部门
+                deptVoList.forEach(d->{
+                    if (n.getDeptNo().equals(d.getDeptNo())){
+                        n.setDeptVo(BeanConv.toBean(d,DeptVo.class));
+                    }
+                });
+
+            });
+        }
+        return postVoList;
+    }
 //
 //    @Override
 //    public List<PostVo> findPostVoListByUserId(Long userId) {

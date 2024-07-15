@@ -57,46 +57,46 @@ public class RoleServiceImpl implements RoleService {
     //自定义
     public static final String DATA_SCOPE_0 = "0";
 
-//    @Override
-//    public PageResponse<RoleVo> findRolePage(RoleDto roleDto, int pageNum, int pageSize) {
-//        PageHelper.startPage(pageNum, pageSize);
-//        Page<List<Role>> page = roleMapper.selectPage(roleDto);
-//        PageResponse<RoleVo> pageResponse = PageResponse.of(page, RoleVo.class);
-//        if (!EmptyUtil.isNullOrEmpty(pageResponse.getRecords())){
-//            List<Long> roleIdSet = pageResponse.getRecords().stream().map(RoleVo::getId).collect(Collectors.toList());
-//            //查询对应资源
-//            List<ResourceVo> resourceList = resourceService.findResourceVoListInRoleId(roleIdSet);
-//            //查询对应数据权限
-//            List<DeptVo> deptVoList = deptService.findDeptVoListInRoleId(roleIdSet);
-//            pageResponse.getRecords().forEach(n->{
-//                //装配资源
-//                Set<String> resourceNoSet = Sets.newHashSet();
-//                if (!EmptyUtil.isNullOrEmpty(resourceList)){
-//                    resourceList.forEach(r->{
-//                        if (String.valueOf(n.getId()).equals(r.getRoleId())){
-//                            resourceNoSet.add(r.getResourceNo());
-//                        }
-//                    });
-//                    if (!EmptyUtil.isNullOrEmpty(resourceNoSet)){
-//                        n.setCheckedResourceNos(resourceNoSet.toArray(new String[resourceNoSet.size()]));
-//                    }
-//                }
-//                //装配数据权限
-//                Set<String> deptNoSet = Sets.newHashSet();
-//                if (!EmptyUtil.isNullOrEmpty(deptVoList)){
-//                    deptVoList.forEach(d->{
-//                        if (String.valueOf(n.getId()).equals(d.getRoleId())){
-//                            deptNoSet.add(d.getDeptNo());
-//                        }
-//                    });
-//                    if (!EmptyUtil.isNullOrEmpty(deptNoSet)){
-//                        n.setCheckedDeptNos(deptNoSet.toArray(new String[deptNoSet.size()]));
-//                    }
-//                }
-//            });
-//        }
-//        return pageResponse;
-//    }
+    @Override
+    public PageResponse<RoleVo> findRolePage(RoleDto roleDto, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        Page<List<Role>> page = roleMapper.selectPage(roleDto);
+        PageResponse<RoleVo> pageResponse = PageResponse.of(page, RoleVo.class);
+        if (!EmptyUtil.isNullOrEmpty(pageResponse.getRecords())){
+            List<Long> roleIdSet = pageResponse.getRecords().stream().map(RoleVo::getId).collect(Collectors.toList());
+            //查询对应资源
+            List<ResourceVo> resourceList = resourceService.findResourceVoListInRoleId(roleIdSet);
+            //查询对应数据权限
+            List<DeptVo> deptVoList = deptService.findDeptVoListInRoleId(roleIdSet);
+            pageResponse.getRecords().forEach(n->{
+                //装配资源
+                Set<String> resourceNoSet = Sets.newHashSet();
+                if (!EmptyUtil.isNullOrEmpty(resourceList)){
+                    resourceList.forEach(r->{
+                        if (String.valueOf(n.getId()).equals(r.getRoleId())){
+                            resourceNoSet.add(r.getResourceNo());
+                        }
+                    });
+                    if (!EmptyUtil.isNullOrEmpty(resourceNoSet)){
+                        n.setCheckedResourceNos(resourceNoSet.toArray(new String[resourceNoSet.size()]));
+                    }
+                }
+                //装配数据权限
+                Set<String> deptNoSet = Sets.newHashSet();
+                if (!EmptyUtil.isNullOrEmpty(deptVoList)){
+                    deptVoList.forEach(d->{
+                        if (String.valueOf(n.getId()).equals(d.getRoleId())){
+                            deptNoSet.add(d.getDeptNo());
+                        }
+                    });
+                    if (!EmptyUtil.isNullOrEmpty(deptNoSet)){
+                        n.setCheckedDeptNos(deptNoSet.toArray(new String[deptNoSet.size()]));
+                    }
+                }
+            });
+        }
+        return pageResponse;
+    }
 
     @Override
     @Transactional
